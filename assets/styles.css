@@ -239,9 +239,9 @@ textarea:focus {
   min-height: 920px;
   padding: 28px clamp(18px, 4vw, 54px) 58px;
   background:
-    radial-gradient(circle at 16% 18%, rgba(255, 255, 255, 0.72), transparent 24%),
-    radial-gradient(circle at 84% 12%, rgba(143, 231, 242, 0.48), transparent 30%),
-    linear-gradient(135deg, rgba(213, 249, 252, 0.78), rgba(123, 219, 226, 0.58) 48%, rgba(255, 242, 207, 0.46)),
+    radial-gradient(circle at 15% 18%, rgba(255, 255, 255, 0.92), transparent 28%),
+    radial-gradient(circle at 85% 10%, rgba(214, 251, 255, 0.78), transparent 34%),
+    linear-gradient(135deg, rgba(239, 254, 255, 0.92), rgba(180, 238, 242, 0.74) 52%, rgba(255, 248, 232, 0.58)),
     url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=80") center/cover;
 }
 
@@ -249,11 +249,11 @@ textarea:focus {
   height: min(1120px, calc(100vh - 82px));
   min-height: 820px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.84);
-  border: 1px solid rgba(213, 249, 252, 0.86);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(235, 255, 255, 0.94);
   border-radius: 8px;
-  box-shadow: 0 24px 54px rgba(6, 82, 96, 0.18);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 18px 42px rgba(6, 82, 96, 0.12);
+  backdrop-filter: blur(14px);
 }
 
 .idx-shell iframe {
