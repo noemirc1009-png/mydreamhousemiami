@@ -1,0 +1,12 @@
+{
+  "name": "mydreamhouse",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Real estate website with a private MLS feed proxy.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

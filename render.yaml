@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: mydreamhouse-peguero-real-state
+    env: node
+    plan: free
+    buildCommand: ""
+    startCommand: "npm start"
+    envVars:
+      - key: MLS_CACHE_SECONDS
+        value: "3600"
+      - key: MLS_PROVIDER
+        value: "MIAMI REALTORS / Matrix IDX"
+      - key: EMAIL_WEBHOOK_URL
+        sync: false

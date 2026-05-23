@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MYDreamHouse Peguero Real State.</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="MYDreamHouse Peguero Real State home">
+      <span class="brand-mark">MDH</span>
+    </a>
+    <nav class="nav">
+      <button class="nav-button active" data-view="idx">Map + List</button>
+      <button class="nav-button" data-view="featured">Featured</button>
+      <button class="nav-button" data-view="favorites">Favorites <span id="favoriteCount">0</span></button>
+      <button class="nav-button" data-view="alerts">Search Alerts</button>
+      <button class="nav-button" data-view="contact">Contact</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="search-band" aria-label="Property search">
+      <div class="search-copy">
+        <h1>MYDreamHouse Peguero Real State.</h1>
+      </div>
+    </section>
+
+    <section class="idx-band" id="idxView" aria-label="Live MLS search">
+      <div class="idx-shell">
+        <iframe
+          id="idxFrame"
+          title="MyDreamHouse live MLS search"
+          src="https://sef.mlsmatrix.com/Matrix/public/IDX.aspx?idx=988b1ef6"
+          width="100%"
+          height="100%"
+          frameborder="0"
+          marginwidth="0"
+          marginheight="0">
+        </iframe>
+      </div>
+    </section>
+
+    <section class="workspace hidden" id="featuredView">
+      <aside class="market-panel">
+        <div>
+          <span class="eyebrow">MLS Feed</span>
+          <h2 id="feedStatus">Sample listings</h2>
+          <p id="feedMessage">Live listings load through the private MLS proxy when credentials are configured.</p>
+        </div>
+        <div class="stat-grid">
+          <div>
+            <strong id="resultCount">0</strong>
+            <span>matches</span>
+          </div>
+          <div>
+            <strong id="medianPrice">$0</strong>
+            <span>median</span>
+          </div>
+        </div>
+        <div class="map-preview" aria-label="Map preview">
+          <img src="https://images.unsplash.com/photo-1569336415962-a4bd9f69c07b?auto=format&fit=crop&w=900&q=80" alt="Map and home search preview">
+        </div>
+      </aside>
+
+      <section class="results-area">
+        <div class="results-header">
+          <div>
+            <span class="eyebrow">Properties</span>
+            <h2>Available Homes</h2>
+          </div>
+          <select id="sortInput" aria-label="Sort listings">
+            <option value="newest">Newest</option>
+            <option value="priceAsc">Price: Low to High</option>
+            <option value="priceDesc">Price: High to Low</option>
+            <option value="beds">Most Beds</option>
+          </select>
+        </div>
+        <div id="listingGrid" class="listing-grid"></div>
+      </section>
+    </section>
+
+    <section class="workspace hidden" id="favoritesView">
+      <section class="results-area full">
+        <div class="results-header">
+          <div>
+            <span class="eyebrow">Saved</span>
+            <h2>Your Favorite Homes</h2>
+          </div>
+        </div>
+        <div id="favoritesGrid" class="listing-grid"></div>
+      </section>
+    </section>
+
+    <section class="contact-band hidden" id="contactView">
+      <div class="contact-copy">
+        <span class="eyebrow">Lead Capture</span>
+        <h2>Send a showing request.</h2>
+        <p>This form is wired for the website experience. When you pick your hosting/backend, it can send leads to email, CRM, or your MLS-integrated workflow.</p>
+      </div>
+      <form id="leadForm" class="lead-form">
+        <label>
+          <span>Name</span>
+          <input required name="name" placeholder="Your name">
+        </label>
+        <label>
+          <span>Email</span>
+          <input required type="email" name="email" placeholder="you@example.com">
+        </label>
+        <label>
+          <span>Interested in</span>
+          <input name="property" placeholder="Address or MLS number">
+        </label>
+        <label>
+          <span>Message</span>
+          <textarea name="message" rows="5" placeholder="I want to schedule a showing..."></textarea>
+        </label>
+        <button class="primary-button" type="submit">Save Lead</button>
+        <p id="leadStatus" class="form-status" role="status"></p>
+      </form>
+    </section>
+
+    <section class="contact-band hidden" id="alertView">
+      <div class="contact-copy">
+        <span class="eyebrow">Automated Alerts</span>
+        <h2>Create a saved search.</h2>
+        <p>Clients can request email alerts for a specific home search. Connect an email or CRM automation webhook on the backend to send matching listings automatically.</p>
+      </div>
+      <form id="alertForm" class="lead-form">
+        <div class="form-grid">
+          <label>
+            <span>Name</span>
+            <input required name="name" placeholder="Client name">
+          </label>
+          <label>
+            <span>Email</span>
+            <input required type="email" name="email" placeholder="client@example.com">
+          </label>
+        </div>
+        <div class="form-grid">
+          <label>
+            <span>City or ZIP</span>
+            <input required name="location" placeholder="Miami, Brickell, 33131">
+          </label>
+          <label>
+            <span>Frequency</span>
+            <select name="frequency">
+              <option value="hourly">Hourly</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-grid three">
+          <label>
+            <span>Min Price</span>
+            <input name="minPrice" inputmode="numeric" placeholder="500000">
+          </label>
+          <label>
+            <span>Max Price</span>
+            <input name="maxPrice" inputmode="numeric" placeholder="1000000">
+          </label>
+          <label>
+            <span>Beds</span>
+            <select name="beds">
+              <option value="">Any</option>
+              <option value="1">1+</option>
+              <option value="2">2+</option>
+              <option value="3">3+</option>
+              <option value="4">4+</option>
+              <option value="5">5+</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-grid">
+          <label>
+            <span>Property Type</span>
+            <select name="propertyType">
+              <option value="">Any</option>
+              <option value="Residential">Residential</option>
+              <option value="Condo">Condo</option>
+              <option value="Townhouse">Townhouse</option>
+              <option value="Multi-Family">Multi-Family</option>
+            </select>
+          </label>
+          <label>
+            <span>Max HOA</span>
+            <select name="hoa">
+              <option value="">Any</option>
+              <option value="0">No HOA</option>
+              <option value="250">$250/mo</option>
+              <option value="500">$500/mo</option>
+              <option value="750">$750/mo</option>
+              <option value="1000">$1,000/mo</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          <span>Notes</span>
+          <textarea name="notes" rows="4" placeholder="Waterfront, parking, preferred neighborhoods..."></textarea>
+        </label>
+        <button class="primary-button" type="submit">Create Alert</button>
+        <p id="alertStatus" class="form-status" role="status"></p>
+      </form>
+    </section>
+  </main>
+
+  <template id="listingTemplate">
+    <article class="listing-card">
+      <div class="listing-media">
+        <img alt="">
+        <button class="favorite-button" type="button" aria-label="Save favorite">Save</button>
+      </div>
+      <div class="listing-body">
+        <div class="price-row">
+          <strong class="price"></strong>
+          <span class="status"></span>
+        </div>
+        <h3></h3>
+        <p class="address"></p>
+        <div class="facts"></div>
+        <div class="card-actions">
+          <button class="secondary-button details-button" type="button">Details</button>
+          <button class="primary-button tour-button" type="button">Request Tour</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/listings.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
