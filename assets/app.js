@@ -14,6 +14,7 @@ const currency = new Intl.NumberFormat("en-US", {
 const elements = {
   searchForm: document.querySelector("#searchForm"),
   queryInput: document.querySelector("#queryInput"),
+  countyInput: document.querySelector("#countyInput"),
   minPrice: document.querySelector("#minPrice"),
   maxPrice: document.querySelector("#maxPrice"),
   bedsInput: document.querySelector("#bedsInput"),
@@ -159,6 +160,7 @@ function normalizeMlsListings(payload) {
     title: item.PublicRemarks?.slice(0, 42) || item.title || "MLS Listing",
     address: item.UnparsedAddress || item.address || "Address available by request",
     city: item.City || item.city || "",
+    county: item.CountyOrParish || item.county || "",
     type: item.PropertySubType || item.type || "Single Family",
     status: item.StandardStatus || item.status || "Active",
     price: Number(item.ListPrice || item.price || 0),
@@ -174,6 +176,7 @@ function normalizeMlsListings(payload) {
 
 function applyFilters() {
   const query = (elements.queryInput?.value || "").trim().toLowerCase();
+  const county = elements.countyInput?.value || "";
   const min = Number(elements.minPrice?.value || 0);
   const max = Number(elements.maxPrice?.value || 999999999);
   const beds = Number(elements.bedsInput?.value || 0);
@@ -183,6 +186,7 @@ function applyFilters() {
   state.filtered = state.listings.filter((listing) => {
     const haystack = `${listing.city} ${listing.address} ${listing.mls}`.toLowerCase();
     return (!query || haystack.includes(query)) &&
+      (!county || listing.county === county) &&
       listing.price >= min &&
       listing.price <= max &&
       listing.beds >= beds &&
@@ -233,6 +237,7 @@ function renderListings(container, listings, favoritesOnly = false) {
       <span>${listing.baths} baths</span>
       <span>${listing.sqft.toLocaleString()} sqft</span>
       <span>HOA ${listing.hoa ? currency.format(listing.hoa) + "/mo" : "N/A"}</span>
+      <span>${listing.county || "County N/A"}</span>
       <span>${listing.type}</span>
       <span>MLS ${listing.mls}</span>
     `;
