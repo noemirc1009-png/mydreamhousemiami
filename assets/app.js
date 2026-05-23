@@ -39,11 +39,73 @@ const elements = {
 };
 
 const mlsRefreshInterval = 60 * 60 * 1000;
+const citiesByCounty = {
+  "Miami-Dade": [
+    "Miami",
+    "Miami Beach",
+    "Brickell",
+    "Doral",
+    "Coral Gables",
+    "Pinecrest",
+    "Aventura",
+    "Sunny Isles Beach",
+    "Homestead",
+    "Hialeah"
+  ],
+  Broward: [
+    "Fort Lauderdale",
+    "Hollywood",
+    "Pembroke Pines",
+    "Miramar",
+    "Weston",
+    "Plantation",
+    "Pompano Beach",
+    "Coral Springs"
+  ],
+  "Palm Beach": [
+    "Boca Raton",
+    "Delray Beach",
+    "West Palm Beach",
+    "Boynton Beach",
+    "Jupiter",
+    "Palm Beach Gardens"
+  ],
+  Monroe: [
+    "Key Largo",
+    "Islamorada",
+    "Marathon",
+    "Key West"
+  ],
+  Martin: [
+    "Stuart",
+    "Palm City",
+    "Jensen Beach",
+    "Hobe Sound"
+  ],
+  "St. Lucie": [
+    "Port St. Lucie",
+    "Fort Pierce",
+    "St. Lucie West"
+  ],
+  Collier: [
+    "Naples",
+    "Marco Island",
+    "Immokalee",
+    "Ave Maria"
+  ],
+  Lee: [
+    "Fort Myers",
+    "Cape Coral",
+    "Bonita Springs",
+    "Estero"
+  ]
+};
 
 init();
 
 async function init() {
   bindEvents();
+  updateCityOptions();
   startMlsAutoRefresh();
   state.listings = await loadListings();
   applyFilters();
@@ -68,6 +130,11 @@ function bindEvents() {
       applyFilters();
     });
   }
+
+  elements.countyInput.addEventListener("change", () => {
+    updateCityOptions();
+    applyFilters();
+  });
 
   elements.sortInput.addEventListener("change", applyFilters);
   elements.featuredSortInput.addEventListener("change", () => {
@@ -110,6 +177,26 @@ function bindEvents() {
 
     elements.alertForm.reset();
   });
+}
+
+function updateCityOptions() {
+  const selectedCounty = elements.countyInput?.value || "";
+  const selectedCity = elements.queryInput?.value || "";
+  const cities = selectedCounty
+    ? citiesByCounty[selectedCounty] || []
+    : Object.values(citiesByCounty).flat();
+
+  elements.queryInput.innerHTML = '<option value="">Any City</option>';
+  cities.forEach((city) => {
+    const option = document.createElement("option");
+    option.value = city;
+    option.textContent = city;
+    elements.queryInput.appendChild(option);
+  });
+
+  if (cities.includes(selectedCity)) {
+    elements.queryInput.value = selectedCity;
+  }
 }
 
 function startMlsAutoRefresh() {
