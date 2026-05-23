@@ -12,6 +12,7 @@ const currency = new Intl.NumberFormat("en-US", {
 });
 
 const elements = {
+  idxFrame: document.querySelector("#idxFrame"),
   searchForm: document.querySelector("#searchForm"),
   queryInput: document.querySelector("#queryInput"),
   countyInput: document.querySelector("#countyInput"),
@@ -22,9 +23,7 @@ const elements = {
   hoaInput: document.querySelector("#hoaInput"),
   resetButton: document.querySelector("#resetButton"),
   sortInput: document.querySelector("#sortInput"),
-  featuredSortInput: document.querySelector("#featuredSortInput"),
   listingGrid: document.querySelector("#listingGrid"),
-  featuredGrid: document.querySelector("#featuredGrid"),
   favoritesGrid: document.querySelector("#favoritesGrid"),
   template: document.querySelector("#listingTemplate"),
   favoriteCount: document.querySelector("#favoriteCount"),
@@ -38,6 +37,7 @@ const elements = {
   alertStatus: document.querySelector("#alertStatus")
 };
 
+const matrixIdxUrl = "https://sef.mlsmatrix.com/Matrix/public/IDX.aspx?idx=988b1ef6";
 const mlsRefreshInterval = 60 * 60 * 1000;
 const citiesByCounty = {
   "Miami-Dade": [
@@ -119,7 +119,7 @@ function bindEvents() {
         applyFilters();
         return;
       }
-      applyFilters();
+      updateIdxFrame();
       switchView("idx");
     });
   }
@@ -127,6 +127,7 @@ function bindEvents() {
   if (elements.resetButton) {
     elements.resetButton.addEventListener("click", () => {
       elements.searchForm.reset();
+      elements.idxFrame.src = matrixIdxUrl;
       applyFilters();
     });
   }
@@ -137,10 +138,6 @@ function bindEvents() {
   });
 
   elements.sortInput.addEventListener("change", applyFilters);
-  elements.featuredSortInput.addEventListener("change", () => {
-    elements.sortInput.value = elements.featuredSortInput.value;
-    applyFilters();
-  });
 
   document.querySelectorAll("[data-view]").forEach((button) => {
     button.addEventListener("click", () => switchView(button.dataset.view));
@@ -199,13 +196,43 @@ function updateCityOptions() {
   }
 }
 
+function updateIdxFrame() {
+  const url = new URL(matrixIdxUrl);
+  const filters = {
+    location: elements.queryInput?.value || "",
+    county: elements.countyInput?.value || "",
+    minprice: elements.minPrice?.value || "",
+    maxprice: elements.maxPrice?.value || "",
+    beds: elements.bedsInput?.value || "",
+    propertytype: elements.typeInput?.value || "",
+    maxhoa: elements.hoaInput?.value || "",
+    nohoa: elements.hoaInput?.value === "0" ? "true" : ""
+  };
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) url.searchParams.set(key, value);
+  });
+
+  url.searchParams.set("refresh", Date.now().toString());
+  elements.idxFrame.src = url.toString();
+}
+
 function startMlsAutoRefresh() {
   window.setInterval(() => {
+    if (state.activeView === "idx") {
+      reloadIdxFrame();
+    }
     loadListings().then((listings) => {
       state.listings = listings;
       applyFilters();
     });
   }, mlsRefreshInterval);
+}
+
+function reloadIdxFrame() {
+  const url = new URL(elements.idxFrame.src || matrixIdxUrl, window.location.href);
+  url.searchParams.set("refresh", Date.now().toString());
+  elements.idxFrame.src = url.toString();
 }
 
 async function loadListings() {
@@ -301,7 +328,6 @@ function sortListings() {
 
 function render() {
   renderListings(elements.listingGrid, state.filtered);
-  renderListings(elements.featuredGrid, state.filtered);
   renderListings(elements.favoritesGrid, state.listings.filter((listing) => state.favorites.has(listing.id)), true);
   elements.favoriteCount.textContent = state.favorites.size;
   elements.resultCount.textContent = state.filtered.length;
