@@ -272,13 +272,17 @@ function applyFilters() {
 
   state.filtered = state.listings.filter((listing) => {
     const city = String(listing.city || "").toLowerCase();
+    const matchesType = !type ||
+      type === listing.type ||
+      (type === "Residential" && ["Single Family", "Townhouse"].includes(listing.type));
+
     return (!query || city === query) &&
       (!county || listing.county === county) &&
       listing.price >= min &&
       listing.price <= max &&
       listing.beds >= beds &&
       (hoa === 0 ? listing.hoa === 0 : listing.hoa <= hoa) &&
-      (!type || type === "Residential" || listing.type === type);
+      matchesType;
   });
 
   sortListings();
