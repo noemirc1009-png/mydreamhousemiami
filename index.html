@@ -92,17 +92,20 @@
           <button class="secondary-button" id="resetButton" type="button">Clear</button>
         </div>
       </form>
-      <div class="idx-shell">
-        <iframe
-          id="idxFrame"
-          title="MyDreamHouse live MLS search"
-          src="https://sef.mlsmatrix.com/Matrix/public/IDX.aspx?idx=988b1ef6"
-          width="100%"
-          height="100%"
-          frameborder="0"
-          marginwidth="0"
-          marginheight="0">
-        </iframe>
+      <div class="idx-results-panel">
+        <div class="results-header">
+          <div>
+            <span class="eyebrow">Search Results</span>
+            <h2>Matching Homes</h2>
+          </div>
+          <select id="sortInput" aria-label="Sort listings">
+            <option value="newest">Newest</option>
+            <option value="priceAsc">Price: Low to High</option>
+            <option value="priceDesc">Price: High to Low</option>
+            <option value="beds">Most Beds</option>
+          </select>
+        </div>
+        <div id="listingGrid" class="listing-grid"></div>
       </div>
     </section>
 
@@ -134,14 +137,14 @@
             <span class="eyebrow">Properties</span>
             <h2>Available Homes</h2>
           </div>
-          <select id="sortInput" aria-label="Sort listings">
+          <select id="featuredSortInput" aria-label="Sort listings">
             <option value="newest">Newest</option>
             <option value="priceAsc">Price: Low to High</option>
             <option value="priceDesc">Price: High to Low</option>
             <option value="beds">Most Beds</option>
           </select>
         </div>
-        <div id="listingGrid" class="listing-grid"></div>
+        <div id="featuredGrid" class="listing-grid"></div>
       </section>
     </section>
 

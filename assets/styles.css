@@ -291,23 +291,14 @@ textarea:focus {
     url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=80") center/cover;
 }
 
-.idx-shell {
-  height: min(1120px, calc(100vh - 82px));
-  min-height: 820px;
-  overflow: hidden;
+.idx-results-panel {
+  min-height: 520px;
+  padding: 20px;
   background: rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(235, 255, 255, 0.94);
   border-radius: 8px;
   box-shadow: 0 18px 42px rgba(6, 82, 96, 0.12);
   backdrop-filter: blur(14px);
-}
-
-.idx-shell iframe {
-  display: block;
-  width: 100%;
-  height: calc(100% + 180px);
-  border: 0;
-  transform: translateY(-180px);
 }
 
 .market-panel,
@@ -600,8 +591,8 @@ p {
     padding-inline: 12px;
   }
 
-  .idx-shell {
-    min-height: 820px;
+  .idx-results-panel {
+    min-height: 520px;
   }
 
   .filters {
