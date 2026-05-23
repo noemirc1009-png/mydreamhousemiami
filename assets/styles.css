@@ -80,6 +80,13 @@ textarea {
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.08em;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.brand:hover .brand-mark {
+  transform: translateY(-2px) scale(1.04);
+  border-color: rgba(255, 242, 207, 0.84);
+  box-shadow: 0 10px 24px rgba(8, 47, 58, 0.22);
 }
 
 .nav {
@@ -106,6 +113,13 @@ textarea {
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  transition: transform 160ms ease, background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+.nav-button:hover {
+  transform: translateY(-1px);
+  color: var(--green-dark);
+  background: rgba(244, 234, 210, 0.62);
 }
 
 .nav-button.active {
@@ -207,6 +221,13 @@ textarea:focus {
   font-weight: 900;
   letter-spacing: 0.03em;
   box-shadow: 0 12px 22px rgba(8, 47, 58, 0.2);
+  transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+.primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(8, 47, 58, 0.24);
+  filter: saturate(1.08);
 }
 
 .secondary-button {
@@ -220,6 +241,13 @@ textarea:focus {
   border-radius: 8px;
   font-weight: 900;
   letter-spacing: 0.03em;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.secondary-button:hover {
+  transform: translateY(-2px);
+  background: var(--champagne-light);
+  box-shadow: 0 10px 20px rgba(8, 47, 58, 0.12);
 }
 
 .workspace {
@@ -381,6 +409,13 @@ p {
   border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow: 0 12px 28px rgba(8, 47, 58, 0.1);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.listing-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(199, 164, 90, 0.42);
+  box-shadow: 0 18px 38px rgba(8, 47, 58, 0.16);
 }
 
 .listing-media {
@@ -403,11 +438,41 @@ p {
   border-radius: 999px;
   font-size: 12px;
   font-weight: 800;
+  transition: transform 160ms ease, background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+}
+
+.favorite-button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 10px 22px rgba(8, 47, 58, 0.16);
 }
 
 .favorite-button.saved {
   color: var(--white);
   background: var(--sun);
+  animation: savePulse 360ms ease;
+}
+
+@keyframes savePulse {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.16);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .listing-body {
