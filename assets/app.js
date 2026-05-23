@@ -184,8 +184,8 @@ function applyFilters() {
   const hoa = Number(elements.hoaInput?.value || 999999);
 
   state.filtered = state.listings.filter((listing) => {
-    const haystack = `${listing.city} ${listing.address} ${listing.mls}`.toLowerCase();
-    return (!query || haystack.includes(query)) &&
+    const city = String(listing.city || "").toLowerCase();
+    return (!query || city === query) &&
       (!county || listing.county === county) &&
       listing.price >= min &&
       listing.price <= max &&
