@@ -305,9 +305,9 @@ textarea:focus {
 .idx-shell iframe {
   display: block;
   width: 100%;
-  height: calc(100% + 190px);
+  height: calc(100% + 360px);
   border: 0;
-  transform: translateY(-190px);
+  transform: translateY(-360px);
 }
 
 .market-panel,
