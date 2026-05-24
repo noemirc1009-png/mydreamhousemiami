@@ -354,9 +354,9 @@ textarea:focus {
 .idx-shell iframe {
   display: block;
   width: 100%;
-  height: calc(100% + 360px);
+  height: 100%;
   border: 0;
-  transform: translateY(-360px);
+  transform: none;
 }
 
 .idx-stage-footer {
