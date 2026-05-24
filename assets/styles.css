@@ -69,6 +69,35 @@ textarea {
     radial-gradient(circle at 20% 14%, rgba(255, 242, 207, 0.34), transparent 28%),
     url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=80") center/cover;
   backdrop-filter: blur(8px);
+  overflow: hidden;
+}
+
+.login-gate::before,
+.login-gate::after {
+  content: "";
+  position: absolute;
+  inset: auto;
+  width: 44vw;
+  min-width: 320px;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(8px);
+  opacity: 0.68;
+}
+
+.login-gate::before {
+  left: -12vw;
+  bottom: -18vw;
+  background: radial-gradient(circle, rgba(143, 231, 242, 0.5), transparent 62%);
+  animation: oceanDrift 12s ease-in-out infinite alternate;
+}
+
+.login-gate::after {
+  top: -18vw;
+  right: -10vw;
+  background: radial-gradient(circle, rgba(255, 242, 207, 0.44), transparent 62%);
+  animation: champagneDrift 14s ease-in-out infinite alternate;
 }
 
 .login-gate.hidden {
@@ -76,6 +105,8 @@ textarea {
 }
 
 .login-panel {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: 16px;
   width: min(440px, 100%);
@@ -86,11 +117,13 @@ textarea {
   border-radius: 8px;
   box-shadow: 0 30px 70px rgba(8, 47, 58, 0.3);
   backdrop-filter: blur(18px);
+  animation: loginReveal 520ms ease both;
 }
 
 .login-panel .brand-mark {
   width: 54px;
   height: 54px;
+  animation: markFloat 3.8s ease-in-out infinite;
 }
 
 .login-panel h1 {
@@ -98,6 +131,53 @@ textarea {
   color: var(--green-dark);
   font-size: clamp(30px, 5vw, 44px);
   line-height: 0.98;
+}
+
+.login-panel input {
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.login-panel input:focus {
+  transform: translateY(-1px);
+}
+
+@keyframes loginReveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes markFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes oceanDrift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(8vw, -5vw, 0) scale(1.14);
+  }
+}
+
+@keyframes champagneDrift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-7vw, 6vw, 0) scale(1.12);
+  }
 }
 
 .brand {
