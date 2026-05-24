@@ -375,7 +375,7 @@ async function submitLead(lead, statusElement, formElement) {
     const sentByFormSubmit = await submitLeadWithFormSubmit(leadWithTime);
     if (sentByFormSubmit) {
       if (statusElement) {
-        statusElement.textContent = "Lead sent. Please check your email and confirm FormSubmit if this is the first message.";
+        statusElement.textContent = "Lead submitted through FormSubmit. If a new tab opened, complete the confirmation there, then check Yahoo spam/inbox.";
       }
       if (formElement) formElement.reset();
       return;
@@ -395,25 +395,19 @@ async function submitLead(lead, statusElement, formElement) {
 
 async function submitLeadWithFormSubmit(lead) {
   try {
-    const iframeName = "formsubmitLeadFrame";
-    let iframe = document.querySelector(`iframe[name="${iframeName}"]`);
-    if (!iframe) {
-      iframe = document.createElement("iframe");
-      iframe.name = iframeName;
-      iframe.hidden = true;
-      document.body.appendChild(iframe);
-    }
-
+    const targetName = `formsubmitLead${Date.now()}`;
+    window.open("", targetName, "width=520,height=680");
     const form = document.createElement("form");
     form.method = "POST";
     form.action = "https://formsubmit.co/misaelpeguero@yahoo.com";
-    form.target = iframeName;
+    form.target = targetName;
     form.hidden = true;
 
     const payload = {
       _subject: "New MyDreamHouse Lead",
       _template: "table",
       _captcha: "false",
+      _next: window.location.href,
       source: lead.source || "website",
       createdAt: lead.createdAt || "",
       name: lead.name || "",
