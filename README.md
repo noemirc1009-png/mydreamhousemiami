@@ -44,11 +44,11 @@ https://sef.mlsmatrix.com/Matrix/public/IDX.aspx?idx=988b1ef6
 
 That iframe is the active MLS feed on the first tab of the site.
 
-The page refreshes the Matrix IDX frame every hour while it is open, so visitors get a fresh pull from the MLS without reloading the whole website.
+The page refreshes the Matrix IDX frame every 30 minutes while it is open, so visitors get a fresh pull from the MLS without reloading the whole website.
 
 ## MLS API Feed
 
-The browser calls `/api/listings`. `server.js` calls your MLS provider from the private backend, caches the response for one hour by default, and returns IDX-safe listing data to the website. If the feed is not configured or unavailable, the site falls back to sample listings from `assets/listings.js`.
+The browser calls `/api/listings`. `server.js` calls your MLS provider from the private backend, caches the response for 30 minutes by default, and returns IDX-safe listing data to the website. If the feed is not configured or unavailable, the site falls back to sample listings from `assets/listings.js`.
 
 This project is set up for MIAMI REALTORS / Bridge API. See `MIAMI_MLS_SETUP.md`.
 

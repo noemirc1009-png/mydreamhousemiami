@@ -57,7 +57,7 @@ const loginCredentials = {
 };
 let beachAudio = null;
 const matrixIdxUrl = "https://sef.mlsmatrix.com/Matrix/public/IDX.aspx?idx=988b1ef6";
-const mlsRefreshInterval = 60 * 60 * 1000;
+const mlsRefreshInterval = 30 * 60 * 1000;
 const citiesByCounty = {
   "Miami-Dade": [
     "Miami",

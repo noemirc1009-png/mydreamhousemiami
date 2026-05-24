@@ -11,7 +11,7 @@ const MLS_BASE_URL = trimTrailingSlash(process.env.MLS_BASE_URL || "");
 const MLS_LISTINGS_PATH = process.env.MLS_LISTINGS_PATH || "/Property";
 const MLS_TOKEN = process.env.MLS_TOKEN || "";
 const MLS_PROVIDER = process.env.MLS_PROVIDER || "MLS feed";
-const CACHE_SECONDS = Number(process.env.MLS_CACHE_SECONDS || 3600);
+const CACHE_SECONDS = Number(process.env.MLS_CACHE_SECONDS || 1800);
 const EMAIL_WEBHOOK_URL = process.env.EMAIL_WEBHOOK_URL || "";
 
 let cachedListings = null;
