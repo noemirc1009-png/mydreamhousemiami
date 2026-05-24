@@ -172,24 +172,6 @@ textarea {
   box-shadow: var(--shadow);
 }
 
-.mls-filter-panel {
-  position: relative;
-  z-index: 2;
-  margin: 0 0 18px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(224, 250, 252, 0.78)),
-    radial-gradient(circle at 8% 12%, rgba(255, 242, 207, 0.56), transparent 28%);
-  border-color: rgba(235, 255, 255, 0.94);
-  box-shadow: 0 18px 42px rgba(6, 82, 96, 0.14);
-  backdrop-filter: blur(16px);
-}
-
-.filter-actions {
-  display: flex;
-  align-items: end;
-  gap: 8px;
-}
-
 label {
   display: grid;
   gap: 6px;
@@ -666,8 +648,7 @@ p {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .filters label:first-child,
-  .filter-actions {
+  .filters label:first-child {
     grid-column: 1 / -1;
   }
 
@@ -689,7 +670,6 @@ p {
   }
 
   .filters,
-  .filter-actions,
   .idx-stage-header,
   .idx-stage-footer,
   .form-grid,

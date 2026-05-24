@@ -133,10 +133,12 @@ function bindEvents() {
     });
   }
 
-  elements.countyInput.addEventListener("change", () => {
-    updateCityOptions();
-    applyFilters();
-  });
+  if (elements.countyInput) {
+    elements.countyInput.addEventListener("change", () => {
+      updateCityOptions();
+      applyFilters();
+    });
+  }
 
   elements.sortInput.addEventListener("change", applyFilters);
 
@@ -178,6 +180,7 @@ function bindEvents() {
 }
 
 function updateCityOptions() {
+  if (!elements.countyInput || !elements.queryInput) return;
   const selectedCounty = elements.countyInput?.value || "";
   const selectedCity = elements.queryInput?.value || "";
   const cities = selectedCounty
