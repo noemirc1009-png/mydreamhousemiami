@@ -26,3 +26,5 @@ services:
         sync: false
       - key: SMTP_FROM
         value: "misaelpeguero@yahoo.com"
+      - key: FORMSUBMIT_EMAIL
+        value: "misaelpeguero@yahoo.com"

@@ -27,6 +27,7 @@ const SMTP_SECURE = String(process.env.SMTP_SECURE || "true") !== "false";
 const SMTP_USER = process.env.SMTP_USER || "";
 const SMTP_PASS = process.env.SMTP_PASS || "";
 const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || "";
+const FORMSUBMIT_EMAIL = process.env.FORMSUBMIT_EMAIL || LEAD_RECIPIENT_EMAIL;
 
 let cachedListings = null;
 let cachedAt = 0;
@@ -281,6 +282,7 @@ async function forwardNotification(type, payload) {
   };
 
   if (await sendSmtpEmail(notification)) return true;
+  if (await sendFormSubmitEmail(notification)) return true;
 
   if (!EMAIL_WEBHOOK_URL) return false;
 
@@ -299,6 +301,56 @@ async function forwardNotification(type, payload) {
     return true;
   } catch (error) {
     console.error("Email webhook failed.", error);
+    return false;
+  }
+}
+
+async function sendFormSubmitEmail(notification) {
+  if (!FORMSUBMIT_EMAIL) return false;
+
+  const data = notification.lead || notification.alert || {};
+  const payload = {
+    _subject: notification.type === "search_alert_created"
+      ? "New MyDreamHouse Search Alert"
+      : "New MyDreamHouse Lead",
+    _template: "table",
+    _captcha: "false",
+    source: notification.source,
+    type: notification.type,
+    createdAt: notification.createdAt,
+    name: data.name || "",
+    email: data.email || "",
+    phone: data.phone || "",
+    property: data.property || "",
+    location: data.location || "",
+    minPrice: data.minPrice || "",
+    maxPrice: data.maxPrice || "",
+    beds: data.beds || "",
+    hoa: data.hoa || "",
+    frequency: data.frequency || "",
+    message: data.message || data.notes || "",
+    page: data.page || "",
+    recordId: data.id || ""
+  };
+
+  try {
+    const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(FORMSUBMIT_EMAIL)}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      console.error(`FormSubmit failed with ${response.status}`);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("FormSubmit email failed.", error);
     return false;
   }
 }

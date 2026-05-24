@@ -87,6 +87,14 @@ SMTP_FROM="misaelpeguero@yahoo.com"
 
 Use a Yahoo app password for `SMTP_PASS`, not your normal Yahoo login password. Add it only in Render environment variables.
 
+If you do not want to use a Yahoo app password, the backend also falls back to FormSubmit:
+
+```text
+FORMSUBMIT_EMAIL="misaelpeguero@yahoo.com"
+```
+
+The first FormSubmit email may ask you to confirm/activate the address. After confirming, new contact form and bot leads should forward to that email.
+
 The backend sends webhook events for:
 
 ```text
