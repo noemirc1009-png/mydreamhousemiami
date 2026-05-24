@@ -13,6 +13,7 @@ window.SAMPLE_LISTINGS = [
     baths: 3,
     sqft: 2460,
     hoa: 0,
+    amenities: ["Waterfront", "Garage"],
     year: 1998,
     listedAt: "2026-05-18",
     image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1100&q=80"
@@ -31,6 +32,7 @@ window.SAMPLE_LISTINGS = [
     baths: 2,
     sqft: 1288,
     hoa: 820,
+    amenities: ["Fitness Center", "Pool"],
     year: 2019,
     listedAt: "2026-05-20",
     image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1100&q=80"
@@ -49,6 +51,7 @@ window.SAMPLE_LISTINGS = [
     baths: 3,
     sqft: 1935,
     hoa: 310,
+    amenities: ["Gated Community", "Garage"],
     year: 2016,
     listedAt: "2026-05-12",
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1100&q=80"
@@ -67,6 +70,7 @@ window.SAMPLE_LISTINGS = [
     baths: 4,
     sqft: 3520,
     hoa: 0,
+    amenities: ["Pool", "Garage"],
     year: 2004,
     listedAt: "2026-05-09",
     image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1100&q=80"
@@ -85,6 +89,7 @@ window.SAMPLE_LISTINGS = [
     baths: 3,
     sqft: 2780,
     hoa: 0,
+    amenities: ["Garage"],
     year: 1978,
     listedAt: "2026-05-21",
     image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1100&q=80"
@@ -103,6 +108,7 @@ window.SAMPLE_LISTINGS = [
     baths: 1,
     sqft: 812,
     hoa: 640,
+    amenities: ["Fitness Center", "Pets Allowed"],
     year: 2017,
     listedAt: "2026-05-15",
     image: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1100&q=80"
@@ -121,6 +127,7 @@ window.SAMPLE_LISTINGS = [
     baths: 2,
     sqft: 1420,
     hoa: 950,
+    amenities: ["Ocean View", "Pool"],
     year: 2020,
     listedAt: "2026-05-22",
     image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1100&q=80"
@@ -139,6 +146,7 @@ window.SAMPLE_LISTINGS = [
     baths: 3,
     sqft: 1850,
     hoa: 740,
+    amenities: ["Waterfront", "Fitness Center"],
     year: 2015,
     listedAt: "2026-05-17",
     image: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1100&q=80"
@@ -157,6 +165,7 @@ window.SAMPLE_LISTINGS = [
     baths: 3,
     sqft: 2320,
     hoa: 0,
+    amenities: ["Garage", "Pool"],
     year: 1996,
     listedAt: "2026-05-19",
     image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1100&q=80"
@@ -175,6 +184,7 @@ window.SAMPLE_LISTINGS = [
     baths: 2,
     sqft: 1225,
     hoa: 610,
+    amenities: ["Waterfront", "Fitness Center"],
     year: 2018,
     listedAt: "2026-05-14",
     image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1100&q=80"
@@ -193,6 +203,7 @@ window.SAMPLE_LISTINGS = [
     baths: 4,
     sqft: 3180,
     hoa: 280,
+    amenities: ["Gated Community", "Garage"],
     year: 2001,
     listedAt: "2026-05-11",
     image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1100&q=80"
@@ -211,6 +222,7 @@ window.SAMPLE_LISTINGS = [
     baths: 3,
     sqft: 1710,
     hoa: 420,
+    amenities: ["Pets Allowed", "Garage"],
     year: 2014,
     listedAt: "2026-05-16",
     image: "https://images.unsplash.com/photo-1600566752355-35792bedcfea?auto=format&fit=crop&w=1100&q=80"
@@ -229,6 +241,7 @@ window.SAMPLE_LISTINGS = [
     baths: 4,
     sqft: 2920,
     hoa: 0,
+    amenities: ["Pool", "Garage"],
     year: 2021,
     listedAt: "2026-05-10",
     image: "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=1100&q=80"
@@ -247,6 +260,7 @@ window.SAMPLE_LISTINGS = [
     baths: 2,
     sqft: 1110,
     hoa: 585,
+    amenities: ["Fitness Center", "Pool"],
     year: 2016,
     listedAt: "2026-05-13",
     image: "https://images.unsplash.com/photo-1600607687644-c7171b42498f?auto=format&fit=crop&w=1100&q=80"
@@ -265,6 +279,7 @@ window.SAMPLE_LISTINGS = [
     baths: 2,
     sqft: 1640,
     hoa: 0,
+    amenities: ["Boat Dock", "Waterfront"],
     year: 1989,
     listedAt: "2026-05-08",
     image: "https://images.unsplash.com/photo-1600563438938-a9a27216b4f5?auto=format&fit=crop&w=1100&q=80"
@@ -283,6 +298,7 @@ window.SAMPLE_LISTINGS = [
     baths: 3,
     sqft: 1890,
     hoa: 390,
+    amenities: ["Pool", "Pets Allowed"],
     year: 2019,
     listedAt: "2026-05-07",
     image: "https://images.unsplash.com/photo-1600573472550-8090b5e0745e?auto=format&fit=crop&w=1100&q=80"

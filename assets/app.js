@@ -21,6 +21,7 @@ const elements = {
   bedsInput: document.querySelector("#bedsInput"),
   typeInput: document.querySelector("#typeInput"),
   hoaInput: document.querySelector("#hoaInput"),
+  amenityInput: document.querySelector("#amenityInput"),
   resetButton: document.querySelector("#resetButton"),
   sortInput: document.querySelector("#sortInput"),
   listingGrid: document.querySelector("#listingGrid"),
@@ -206,6 +207,7 @@ function updateIdxFrame() {
     beds: elements.bedsInput?.value || "",
     propertytype: elements.typeInput?.value || "",
     maxhoa: elements.hoaInput?.value || "",
+    amenity: elements.amenityInput?.value || "",
     nohoa: elements.hoaInput?.value === "0" ? "true" : ""
   };
 
@@ -276,6 +278,7 @@ function normalizeMlsListings(payload) {
     city: item.City || item.city || "",
     county: item.CountyOrParish || item.county || "",
     type: item.PropertySubType || item.type || "Single Family",
+    amenities: item.AssociationAmenities || item.CommunityFeatures || item.amenities || [],
     status: item.StandardStatus || item.status || "Active",
     price: Number(item.ListPrice || item.price || 0),
     beds: Number(item.BedroomsTotal || item.beds || 0),
@@ -296,6 +299,7 @@ function applyFilters() {
   const beds = Number(elements.bedsInput?.value || 0);
   const type = elements.typeInput?.value || "";
   const hoa = Number(elements.hoaInput?.value || 999999);
+  const amenity = elements.amenityInput?.value || "";
 
   state.filtered = state.listings.filter((listing) => {
     const city = String(listing.city || "").toLowerCase();
@@ -309,6 +313,7 @@ function applyFilters() {
       listing.price <= max &&
       listing.beds >= beds &&
       (hoa === 0 ? listing.hoa === 0 : listing.hoa <= hoa) &&
+      (!amenity || listing.amenities.includes(amenity)) &&
       matchesType;
   });
 
@@ -355,6 +360,7 @@ function renderListings(container, listings, favoritesOnly = false) {
       <span>${listing.sqft.toLocaleString()} sqft</span>
       <span>HOA ${listing.hoa ? currency.format(listing.hoa) + "/mo" : "N/A"}</span>
       <span>${listing.county || "County N/A"}</span>
+      <span>${listing.amenities?.[0] || "Amenities"}</span>
       <span>${listing.type}</span>
       <span>MLS ${listing.mls}</span>
     `;
