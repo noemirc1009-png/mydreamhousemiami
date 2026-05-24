@@ -395,28 +395,47 @@ async function submitLead(lead, statusElement, formElement) {
 
 async function submitLeadWithFormSubmit(lead) {
   try {
-    const response = await fetch("https://formsubmit.co/ajax/misaelpeguero@yahoo.com", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json"
-      },
-      body: JSON.stringify({
-        _subject: "New MyDreamHouse Lead",
-        _template: "table",
-        _captcha: "false",
-        source: lead.source || "website",
-        createdAt: lead.createdAt || "",
-        name: lead.name || "",
-        email: lead.email || "",
-        phone: lead.phone || "",
-        property: lead.property || "",
-        message: lead.message || lead.notes || "",
-        page: lead.page || window.location.href
-      })
+    const iframeName = "formsubmitLeadFrame";
+    let iframe = document.querySelector(`iframe[name="${iframeName}"]`);
+    if (!iframe) {
+      iframe = document.createElement("iframe");
+      iframe.name = iframeName;
+      iframe.hidden = true;
+      document.body.appendChild(iframe);
+    }
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "https://formsubmit.co/misaelpeguero@yahoo.com";
+    form.target = iframeName;
+    form.hidden = true;
+
+    const payload = {
+      _subject: "New MyDreamHouse Lead",
+      _template: "table",
+      _captcha: "false",
+      source: lead.source || "website",
+      createdAt: lead.createdAt || "",
+      name: lead.name || "",
+      email: lead.email || "",
+      phone: lead.phone || "",
+      property: lead.property || "",
+      message: lead.message || lead.notes || "",
+      page: lead.page || window.location.href
+    };
+
+    Object.entries(payload).forEach(([name, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = value;
+      form.appendChild(input);
     });
 
-    return response.ok;
+    document.body.appendChild(form);
+    form.submit();
+    form.remove();
+    return true;
   } catch (formSubmitError) {
     console.error(formSubmitError);
     return false;
