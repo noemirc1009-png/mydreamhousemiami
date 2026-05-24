@@ -842,6 +842,180 @@ p {
   color: var(--muted);
 }
 
+.chatbot-widget {
+  position: fixed;
+  right: clamp(16px, 3vw, 34px);
+  bottom: clamp(16px, 3vw, 34px);
+  z-index: 70;
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.new-listing-pop:not(.hidden) + .chatbot-widget {
+  bottom: clamp(420px, 48vh, 520px);
+}
+
+.chatbot-toggle,
+.chatbot-close,
+.chatbot-quick button,
+.chatbot-form button {
+  border: 0;
+  cursor: pointer;
+}
+
+.chatbot-toggle {
+  pointer-events: auto;
+  min-height: 54px;
+  padding: 0 20px;
+  color: var(--champagne-light);
+  background:
+    linear-gradient(135deg, rgba(8, 47, 58, 0.98), rgba(12, 111, 104, 0.95)),
+    radial-gradient(circle at 18% 12%, rgba(255, 242, 207, 0.35), transparent 32%);
+  border: 1px solid rgba(255, 242, 207, 0.68);
+  border-radius: 999px;
+  box-shadow: 0 18px 38px rgba(8, 47, 58, 0.28);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.chatbot-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 44px rgba(8, 47, 58, 0.32);
+}
+
+.chatbot-panel {
+  pointer-events: auto;
+  display: grid;
+  grid-template-rows: auto minmax(180px, 1fr) auto auto;
+  width: min(390px, calc(100vw - 32px));
+  max-height: min(660px, calc(100vh - 110px));
+  overflow: hidden;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(224, 250, 252, 0.88)),
+    radial-gradient(circle at 16% 0%, rgba(255, 242, 207, 0.48), transparent 34%);
+  border: 1px solid rgba(255, 242, 207, 0.78);
+  border-radius: 8px;
+  box-shadow: 0 28px 68px rgba(8, 47, 58, 0.28);
+  backdrop-filter: blur(18px);
+  animation: botRise 240ms ease both;
+}
+
+.chatbot-panel.hidden {
+  display: none;
+}
+
+.chatbot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(8, 47, 58, 0.96), rgba(12, 111, 104, 0.86));
+}
+
+.chatbot-header h2 {
+  margin: 0;
+  color: var(--champagne-light);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.chatbot-close {
+  min-height: 34px;
+  padding: 0 10px;
+  color: var(--green-dark);
+  background: var(--champagne-light);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.chatbot-messages {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.chat-message {
+  max-width: 86%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  line-height: 1.42;
+  box-shadow: 0 8px 18px rgba(8, 47, 58, 0.08);
+}
+
+.chat-message.bot {
+  justify-self: start;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(216, 209, 189, 0.86);
+}
+
+.chat-message.user {
+  justify-self: end;
+  color: var(--champagne-light);
+  background: linear-gradient(135deg, var(--green-dark), var(--green));
+}
+
+.chatbot-quick {
+  display: flex;
+  gap: 8px;
+  padding: 0 14px 12px;
+  overflow-x: auto;
+}
+
+.chatbot-quick button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 11px;
+  color: var(--green-dark);
+  background: var(--champagne);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.chatbot-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid rgba(216, 209, 189, 0.74);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.chatbot-form input {
+  min-height: 42px;
+}
+
+.chatbot-form button {
+  min-height: 42px;
+  padding: 0 14px;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--green-dark), var(--green));
+  border-radius: 8px;
+  font-weight: 900;
+}
+
+@keyframes botRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes popIn {
   from {
     opacity: 0;
@@ -922,6 +1096,19 @@ p {
 
   .search-copy h1 {
     font-size: 36px;
+  }
+
+  .chatbot-widget {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .new-listing-pop:not(.hidden) + .chatbot-widget {
+    bottom: 12px;
+  }
+
+  .chatbot-panel {
+    max-height: calc(100vh - 88px);
   }
 
 }

@@ -62,15 +62,29 @@ MLS_TOKEN="your-private-token"
 
 For production, MLS credentials should live on a private backend, not inside browser JavaScript. The website should call your backend, and your backend should call the MLS.
 
-## Search Alerts
+## Lead Emails
 
-Clients can create saved search alerts from the `Search Alerts` tab. The backend saves alert requests to `data/search-alerts.json`.
+The contact form and chat bot post new leads to `/api/leads`. The backend saves them to `data/leads.json`.
 
-To forward new alert requests into an email or CRM automation, set:
+To receive new leads automatically by email or CRM automation, create a webhook in a service like Zapier, Make, Pipedream, Formspree, or your CRM, then set these environment variables in Render:
 
 ```text
 EMAIL_WEBHOOK_URL="https://your-email-or-crm-webhook"
+LEAD_RECIPIENT_EMAIL="your-email@example.com"
 ```
+
+The backend sends webhook events for:
+
+```text
+lead_created
+search_alert_created
+```
+
+GitHub Pages cannot run this backend. Automatic lead emails require the Node server to be hosted on Render or another backend host.
+
+## Search Alerts
+
+Clients can create saved search alerts from the `Search Alerts` tab. The backend saves alert requests to `data/search-alerts.json` and sends them to the same email webhook when configured.
 
 The current Matrix iframe cannot expose individual listing matches to this website. Fully automatic matched-listing emails require either Matrix/MLS client portal alerts or a RESO/IDX API feed connected to the backend.
 

@@ -13,6 +13,7 @@ const MLS_TOKEN = process.env.MLS_TOKEN || "";
 const MLS_PROVIDER = process.env.MLS_PROVIDER || "MLS feed";
 const CACHE_SECONDS = Number(process.env.MLS_CACHE_SECONDS || 1800);
 const EMAIL_WEBHOOK_URL = process.env.EMAIL_WEBHOOK_URL || "";
+const LEAD_RECIPIENT_EMAIL = process.env.LEAD_RECIPIENT_EMAIL || "";
 
 let cachedListings = null;
 let cachedAt = 0;
@@ -49,6 +50,10 @@ const server = http.createServer(async (request, response) => {
       return handleSearchAlert(request, response);
     }
 
+    if (requestUrl.pathname === "/api/leads" && request.method === "POST") {
+      return handleLead(request, response);
+    }
+
     return serveStatic(requestUrl.pathname, response);
   } catch (error) {
     console.error(error);
@@ -81,22 +86,48 @@ async function handleSearchAlert(request, response) {
 
   await appendJsonRecord(path.join(__dirname, "data", "search-alerts.json"), savedAlert);
 
-  if (EMAIL_WEBHOOK_URL) {
-    await fetch(EMAIL_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "search_alert_created",
-        source: "MYDreamHouse Peguero Real State.",
-        alert: savedAlert
-      })
-    });
-  }
+  const forwarded = await forwardNotification("search_alert_created", { alert: savedAlert });
 
   return sendJson(response, 201, {
     ok: true,
     alertId: savedAlert.id,
-    emailAutomationConnected: Boolean(EMAIL_WEBHOOK_URL)
+    emailAutomationConnected: forwarded
+  });
+}
+
+async function handleLead(request, response) {
+  const lead = await readJsonBody(request);
+  const hasContact = String(lead.email || "").trim() || String(lead.phone || "").trim();
+  const hasMessage = String(lead.message || lead.property || "").trim();
+
+  if (!hasContact && !hasMessage) {
+    return sendJson(response, 400, {
+      error: "Missing lead details.",
+      required: "Send at least an email, phone, message, or property."
+    });
+  }
+
+  const savedLead = {
+    id: `LEAD-${Date.now()}`,
+    createdAt: new Date().toISOString(),
+    status: "new",
+    source: lead.source || "website",
+    name: lead.name || "",
+    email: lead.email || "",
+    phone: lead.phone || "",
+    property: lead.property || "",
+    message: lead.message || "",
+    page: lead.page || "",
+    ...lead
+  };
+
+  await appendJsonRecord(path.join(__dirname, "data", "leads.json"), savedLead);
+  const forwarded = await forwardNotification("lead_created", { lead: savedLead });
+
+  return sendJson(response, 201, {
+    ok: true,
+    leadId: savedLead.id,
+    emailAutomationConnected: forwarded
   });
 }
 
@@ -225,6 +256,36 @@ async function appendJsonRecord(filePath, record) {
 
   records.push(record);
   await fs.promises.writeFile(filePath, JSON.stringify(records, null, 2));
+}
+
+async function forwardNotification(type, payload) {
+  if (!EMAIL_WEBHOOK_URL) return false;
+
+  const notification = {
+    type,
+    source: "MYDreamHouse Peguero Real State.",
+    recipientEmail: LEAD_RECIPIENT_EMAIL,
+    createdAt: new Date().toISOString(),
+    ...payload
+  };
+
+  try {
+    const response = await fetch(EMAIL_WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(notification)
+    });
+
+    if (!response.ok) {
+      console.error(`Email webhook failed with ${response.status}`);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Email webhook failed.", error);
+    return false;
+  }
 }
 
 function loadDotEnv() {

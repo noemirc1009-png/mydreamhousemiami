@@ -47,7 +47,14 @@ const elements = {
   newListingPrice: document.querySelector("#newListingPrice"),
   newListingTitle: document.querySelector("#newListingTitle"),
   newListingAddress: document.querySelector("#newListingAddress"),
-  newListingTour: document.querySelector("#newListingTour")
+  newListingTour: document.querySelector("#newListingTour"),
+  chatbotWidget: document.querySelector("#chatbotWidget"),
+  chatbotToggle: document.querySelector("#chatbotToggle"),
+  chatbotPanel: document.querySelector("#chatbotPanel"),
+  chatbotClose: document.querySelector("#chatbotClose"),
+  chatbotMessages: document.querySelector("#chatbotMessages"),
+  chatbotForm: document.querySelector("#chatbotForm"),
+  chatbotInput: document.querySelector("#chatbotInput")
 };
 
 const loginCredentials = {
@@ -169,9 +176,11 @@ function bindEvents() {
   elements.leadForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const lead = Object.fromEntries(new FormData(elements.leadForm).entries());
-    localStorage.setItem("mdhLastLead", JSON.stringify({ ...lead, createdAt: new Date().toISOString() }));
-    elements.leadStatus.textContent = "Lead saved locally. Connect a backend to send it automatically.";
-    elements.leadForm.reset();
+    submitLead({
+      ...lead,
+      source: "contact_form",
+      page: window.location.href
+    }, elements.leadStatus, elements.leadForm);
   });
 
   elements.alertForm.addEventListener("submit", async (event) => {
@@ -207,6 +216,172 @@ function bindEvents() {
       document.querySelector("[name='property']").value = `${listing.address} - MLS ${listing.mls}`;
     }
   });
+
+  bindChatbot();
+}
+
+function bindChatbot() {
+  if (!elements.chatbotWidget) return;
+
+  elements.chatbotToggle.addEventListener("click", () => toggleChatbot(true));
+  elements.chatbotClose.addEventListener("click", () => toggleChatbot(false));
+  elements.chatbotForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    handleBotPrompt(elements.chatbotInput.value);
+  });
+
+  document.querySelectorAll("[data-bot-prompt]").forEach((button) => {
+    button.addEventListener("click", () => handleBotPrompt(button.dataset.botPrompt));
+  });
+
+  addBotMessage("Hi, I am the MyDreamHouse assistant. I can help with showings, saved searches, favorites, and Miami-area home questions.");
+}
+
+function toggleChatbot(open) {
+  elements.chatbotPanel.classList.toggle("hidden", !open);
+  elements.chatbotToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  if (open) {
+    elements.chatbotInput.focus();
+  }
+}
+
+function handleBotPrompt(rawPrompt) {
+  const prompt = rawPrompt.trim();
+  if (!prompt) return;
+
+  addUserMessage(prompt);
+  elements.chatbotInput.value = "";
+
+  window.setTimeout(() => {
+    const reply = getBotReply(prompt);
+    addBotMessage(reply.message);
+    if (reply.action) reply.action();
+  }, 260);
+}
+
+function addUserMessage(message) {
+  addChatMessage(message, "user");
+}
+
+function addBotMessage(message) {
+  addChatMessage(message, "bot");
+}
+
+function addChatMessage(message, type) {
+  const bubble = document.createElement("div");
+  bubble.className = `chat-message ${type}`;
+  bubble.textContent = message;
+  elements.chatbotMessages.appendChild(bubble);
+  elements.chatbotMessages.scrollTop = elements.chatbotMessages.scrollHeight;
+}
+
+function getBotReply(prompt) {
+  const text = prompt.toLowerCase();
+
+  if (text.includes("showing") || text.includes("tour") || text.includes("appointment") || text.includes("visit")) {
+    return {
+      message: "Perfect. I opened the contact form so you can request a showing. Add the address or MLS number and your preferred time.",
+      action: () => switchView("contact")
+    };
+  }
+
+  if (text.includes("alert") || text.includes("email") || text.includes("saved search") || text.includes("automatic")) {
+    return {
+      message: "I opened Search Alerts. Your client can enter city, price, beds, HOA preference, and frequency for automated listing emails.",
+      action: () => switchView("alerts")
+    };
+  }
+
+  if (text.includes("search") || text.includes("mls") || text.includes("idx") || text.includes("map")) {
+    return {
+      message: "The live Matrix IDX search is on Map + List. Use the MLS tools there for the most accurate live results from your IDX feed.",
+      action: () => switchView("idx")
+    };
+  }
+
+  if (text.includes("favorite") || text.includes("save")) {
+    return {
+      message: "I opened Favorites. Visitors can save homes from the Featured listings and come back to them on this device.",
+      action: () => switchView("favorites")
+    };
+  }
+
+  if (text.includes("hoa")) {
+    return {
+      message: "For HOA, use Search Alerts to request a maximum HOA or No HOA. The live MLS Matrix window also has the official MLS criteria filters."
+    };
+  }
+
+  if (text.includes("price") || text.includes("budget") || text.includes("pre approval") || text.includes("preapproval")) {
+    return {
+      message: "I can help narrow a search by budget. For a serious purchase, get pre-approved first, then use Search Alerts with your price range and preferred city."
+    };
+  }
+
+  if (looksLikeLead(prompt)) {
+    saveBotLead(prompt);
+    return {
+      message: "Thank you. I saved your message as a lead on this browser. For faster service, open Contact and send your name, email, and property details.",
+      action: () => switchView("contact")
+    };
+  }
+
+  return {
+    message: "I can help with: schedule a showing, create a search alert, search MLS homes, explain HOA options, or open favorites. What would you like to do?"
+  };
+}
+
+function looksLikeLead(text) {
+  return /\b[\w.%+-]+@[\w.-]+\.[a-z]{2,}\b/i.test(text) || /\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/.test(text);
+}
+
+function saveBotLead(message) {
+  const leads = JSON.parse(localStorage.getItem("mdhBotLeads") || "[]");
+  const lead = {
+    message,
+    source: "chatbot",
+    page: window.location.href,
+    createdAt: new Date().toISOString()
+  };
+  leads.push(lead);
+  localStorage.setItem("mdhBotLeads", JSON.stringify(leads));
+  submitLead(lead);
+}
+
+async function submitLead(lead, statusElement, formElement) {
+  const leadWithTime = {
+    ...lead,
+    createdAt: lead.createdAt || new Date().toISOString()
+  };
+
+  try {
+    const response = await fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(leadWithTime)
+    });
+
+    if (!response.ok) throw new Error(`Lead request failed: ${response.status}`);
+    const result = await response.json();
+
+    if (statusElement) {
+      statusElement.textContent = result.emailAutomationConnected
+        ? "Lead sent. We will contact you soon."
+        : "Lead saved on the backend. Add the email webhook to receive automatic emails.";
+    }
+
+    if (formElement) formElement.reset();
+  } catch (error) {
+    const savedLeads = JSON.parse(localStorage.getItem("mdhPendingLeads") || "[]");
+    savedLeads.push(leadWithTime);
+    localStorage.setItem("mdhPendingLeads", JSON.stringify(savedLeads));
+
+    if (statusElement) {
+      statusElement.textContent = "Lead saved on this browser. Backend email sending is not connected yet.";
+    }
+
+    console.error(error);
+  }
 }
 
 function scheduleNewListingPop() {
