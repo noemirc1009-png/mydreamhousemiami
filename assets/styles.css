@@ -771,6 +771,101 @@ p {
   text-align: center;
 }
 
+.new-listing-pop {
+  position: fixed;
+  right: clamp(16px, 3vw, 34px);
+  bottom: clamp(16px, 3vw, 34px);
+  z-index: 50;
+  display: grid;
+  gap: 12px;
+  width: min(360px, calc(100vw - 32px));
+  padding: 14px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.94), rgba(224, 250, 252, 0.82)),
+    radial-gradient(circle at 12% 0%, rgba(255, 242, 207, 0.5), transparent 34%);
+  border: 1px solid rgba(255, 242, 207, 0.72);
+  border-radius: 8px;
+  box-shadow: 0 24px 54px rgba(8, 47, 58, 0.24);
+  backdrop-filter: blur(16px);
+  animation: popIn 520ms ease both;
+}
+
+.new-listing-pop.hidden {
+  display: none;
+}
+
+.pop-close {
+  justify-self: end;
+  min-height: 32px;
+  padding: 0 10px;
+  color: var(--green-dark);
+  background: var(--champagne);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pop-media {
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: var(--sky);
+  border-radius: 8px;
+}
+
+.pop-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  animation: photoFloat 7s ease-in-out infinite alternate;
+}
+
+.pop-copy {
+  display: grid;
+  gap: 7px;
+}
+
+.pop-copy strong {
+  color: var(--green-dark);
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.pop-copy h2 {
+  margin: 0;
+  color: var(--green-dark);
+  font-size: 20px;
+}
+
+.pop-copy p {
+  margin: 0;
+  color: var(--muted);
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes photoFloat {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
 @media (max-width: 980px) {
   .search-band,
   .workspace,

@@ -240,6 +240,20 @@
     </section>
   </main>
 
+  <aside class="new-listing-pop hidden" id="newListingPop" aria-live="polite">
+    <button class="pop-close" id="newListingClose" type="button" aria-label="Close new listing popup">Close</button>
+    <span class="eyebrow">New Listing</span>
+    <div class="pop-media">
+      <img id="newListingImage" alt="">
+    </div>
+    <div class="pop-copy">
+      <strong id="newListingPrice"></strong>
+      <h2 id="newListingTitle"></h2>
+      <p id="newListingAddress"></p>
+      <button class="primary-button" id="newListingTour" type="button">Request Tour</button>
+    </div>
+  </aside>
+
   <template id="listingTemplate">
     <article class="listing-card">
       <div class="listing-media">

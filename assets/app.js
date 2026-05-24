@@ -41,7 +41,14 @@ const elements = {
   leadForm: document.querySelector("#leadForm"),
   leadStatus: document.querySelector("#leadStatus"),
   alertForm: document.querySelector("#alertForm"),
-  alertStatus: document.querySelector("#alertStatus")
+  alertStatus: document.querySelector("#alertStatus"),
+  newListingPop: document.querySelector("#newListingPop"),
+  newListingClose: document.querySelector("#newListingClose"),
+  newListingImage: document.querySelector("#newListingImage"),
+  newListingPrice: document.querySelector("#newListingPrice"),
+  newListingTitle: document.querySelector("#newListingTitle"),
+  newListingAddress: document.querySelector("#newListingAddress"),
+  newListingTour: document.querySelector("#newListingTour")
 };
 
 const loginCredentials = {
@@ -121,6 +128,7 @@ async function init() {
   startMlsAutoRefresh();
   state.listings = await loadListings();
   applyFilters();
+  scheduleNewListingPop();
 }
 
 function bindEvents() {
@@ -190,6 +198,42 @@ function bindEvents() {
 
     elements.alertForm.reset();
   });
+
+  elements.newListingClose.addEventListener("click", hideNewListingPop);
+  elements.newListingTour.addEventListener("click", () => {
+    const listing = state.featuredListing;
+    hideNewListingPop();
+    if (listing) {
+      switchView("contact");
+      document.querySelector("[name='property']").value = `${listing.address} - MLS ${listing.mls}`;
+    }
+  });
+}
+
+function scheduleNewListingPop() {
+  window.setTimeout(() => {
+    if (sessionStorage.getItem("mdhListingPopClosed") === "true") return;
+    showNewListingPop();
+  }, 1800);
+}
+
+function showNewListingPop() {
+  const listings = [...state.listings].sort((a, b) => new Date(b.listedAt) - new Date(a.listedAt));
+  const listing = listings[0];
+  if (!listing) return;
+
+  state.featuredListing = listing;
+  elements.newListingImage.src = listing.image;
+  elements.newListingImage.alt = listing.title;
+  elements.newListingPrice.textContent = currency.format(listing.price);
+  elements.newListingTitle.textContent = listing.title;
+  elements.newListingAddress.textContent = listing.address;
+  elements.newListingPop.classList.remove("hidden");
+}
+
+function hideNewListingPop() {
+  sessionStorage.setItem("mdhListingPopClosed", "true");
+  elements.newListingPop.classList.add("hidden");
 }
 
 function bindLogin() {
