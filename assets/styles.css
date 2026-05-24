@@ -103,10 +103,6 @@ textarea {
   animation: champagneDrift 14s ease-in-out infinite alternate;
 }
 
-.login-gate .sound-button {
-  min-height: 42px;
-}
-
 .login-gate.hidden {
   display: none;
 }

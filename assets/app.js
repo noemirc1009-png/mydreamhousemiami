@@ -17,7 +17,6 @@ const elements = {
   loginUser: document.querySelector("#loginUser"),
   loginPassword: document.querySelector("#loginPassword"),
   loginStatus: document.querySelector("#loginStatus"),
-  beachSoundButton: document.querySelector("#beachSoundButton"),
   idxFrame: document.querySelector("#idxFrame"),
   searchForm: document.querySelector("#searchForm"),
   queryInput: document.querySelector("#queryInput"),
@@ -241,6 +240,10 @@ function bindLogin() {
     elements.loginGate.classList.add("hidden");
   }
 
+  startBeachSound();
+  elements.loginGate.addEventListener("pointerdown", startBeachSound, { once: true });
+  elements.loginGate.addEventListener("keydown", startBeachSound, { once: true });
+
   elements.loginForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const username = elements.loginUser.value.trim();
@@ -255,19 +258,22 @@ function bindLogin() {
 
     elements.loginStatus.textContent = "Incorrect username or password.";
   });
+}
 
-  elements.beachSoundButton.addEventListener("click", () => {
-    if (beachAudio) {
-      beachAudio.stop();
-      beachAudio = null;
-      elements.beachSoundButton.textContent = "Beach Sound";
-      return;
-    }
+function startBeachSound() {
+  if (elements.loginGate.classList.contains("hidden")) return;
+  if (beachAudio) {
+    beachAudio.resume();
+    return;
+  }
 
+  try {
     beachAudio = createBeachSound();
     beachAudio.start();
-    elements.beachSoundButton.textContent = "Stop Sound";
-  });
+  } catch (error) {
+    beachAudio = null;
+    console.info("Beach sound will start after browser allows audio.", error);
+  }
 }
 
 function createBeachSound() {
@@ -312,6 +318,10 @@ function createBeachSound() {
     start() {
       noise.start();
       waveOscillator.start();
+      context.resume();
+    },
+    resume() {
+      context.resume();
     },
     stop() {
       noise.stop();
