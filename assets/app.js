@@ -44,8 +44,8 @@ const elements = {
 };
 
 const loginCredentials = {
-  username: "peguero",
-  password: "dreamhouse2026"
+  username: "Peguero26",
+  password: "MyHouse26"
 };
 const matrixIdxUrl = "https://sef.mlsmatrix.com/Matrix/public/IDX.aspx?idx=988b1ef6";
 const mlsRefreshInterval = 60 * 60 * 1000;
