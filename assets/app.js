@@ -372,6 +372,15 @@ async function submitLead(lead, statusElement, formElement) {
 
     if (formElement) formElement.reset();
   } catch (error) {
+    const sentByFormSubmit = await submitLeadWithFormSubmit(leadWithTime);
+    if (sentByFormSubmit) {
+      if (statusElement) {
+        statusElement.textContent = "Lead sent. Please check your email and confirm FormSubmit if this is the first message.";
+      }
+      if (formElement) formElement.reset();
+      return;
+    }
+
     const savedLeads = JSON.parse(localStorage.getItem("mdhPendingLeads") || "[]");
     savedLeads.push(leadWithTime);
     localStorage.setItem("mdhPendingLeads", JSON.stringify(savedLeads));
@@ -381,6 +390,36 @@ async function submitLead(lead, statusElement, formElement) {
     }
 
     console.error(error);
+  }
+}
+
+async function submitLeadWithFormSubmit(lead) {
+  try {
+    const response = await fetch("https://formsubmit.co/ajax/misaelpeguero@yahoo.com", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify({
+        _subject: "New MyDreamHouse Lead",
+        _template: "table",
+        _captcha: "false",
+        source: lead.source || "website",
+        createdAt: lead.createdAt || "",
+        name: lead.name || "",
+        email: lead.email || "",
+        phone: lead.phone || "",
+        property: lead.property || "",
+        message: lead.message || lead.notes || "",
+        page: lead.page || window.location.href
+      })
+    });
+
+    return response.ok;
+  } catch (formSubmitError) {
+    console.error(formSubmitError);
+    return false;
   }
 }
 
