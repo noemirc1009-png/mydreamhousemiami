@@ -12,3 +12,5 @@ services:
         value: "MIAMI REALTORS / Matrix IDX"
       - key: EMAIL_WEBHOOK_URL
         sync: false
+      - key: LEAD_RECIPIENT_EMAIL
+        value: "misaelpeguero@yahoo.com"
