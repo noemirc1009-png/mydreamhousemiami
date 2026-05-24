@@ -291,14 +291,63 @@ textarea:focus {
     url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=80") center/cover;
 }
 
+.idx-stage {
+  position: relative;
+  padding: 18px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(213, 249, 252, 0.54)),
+    radial-gradient(circle at 12% 0%, rgba(255, 242, 207, 0.42), transparent 32%);
+  border: 1px solid rgba(255, 242, 207, 0.72);
+  border-radius: 8px;
+  box-shadow: 0 28px 68px rgba(6, 82, 96, 0.18);
+  backdrop-filter: blur(18px);
+}
+
+.idx-stage-header,
+.idx-stage-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.idx-stage-header {
+  padding: 2px 4px 16px;
+}
+
+.idx-stage-header h2 {
+  margin: 0;
+  color: var(--green-dark);
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.idx-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  color: var(--champagne-light);
+  background: linear-gradient(135deg, var(--green-dark), var(--green));
+  border: 1px solid rgba(255, 242, 207, 0.52);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 12px 24px rgba(8, 47, 58, 0.18);
+  white-space: nowrap;
+}
+
 .idx-shell {
   height: min(1120px, calc(100vh - 82px));
   min-height: 820px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(235, 255, 255, 0.94);
+  border: 1px solid rgba(255, 242, 207, 0.7);
   border-radius: 8px;
-  box-shadow: 0 18px 42px rgba(6, 82, 96, 0.12);
+  box-shadow: 0 18px 42px rgba(6, 82, 96, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.86);
   backdrop-filter: blur(14px);
 }
 
@@ -308,6 +357,15 @@ textarea:focus {
   height: calc(100% + 360px);
   border: 0;
   transform: translateY(-360px);
+}
+
+.idx-stage-footer {
+  padding: 14px 4px 0;
+  color: #8d7956;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .market-panel,
@@ -632,6 +690,8 @@ p {
 
   .filters,
   .filter-actions,
+  .idx-stage-header,
+  .idx-stage-footer,
   .form-grid,
   .form-grid.three,
   .results-header,
@@ -640,6 +700,10 @@ p {
     grid-template-columns: 1fr;
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .idx-stage {
+    padding: 12px;
   }
 
   .search-copy h1 {
