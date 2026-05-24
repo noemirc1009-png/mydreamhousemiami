@@ -381,16 +381,36 @@ async function submitLead(lead, statusElement, formElement) {
       return;
     }
 
+    openLeadEmailFallback(leadWithTime);
+
     const savedLeads = JSON.parse(localStorage.getItem("mdhPendingLeads") || "[]");
     savedLeads.push(leadWithTime);
     localStorage.setItem("mdhPendingLeads", JSON.stringify(savedLeads));
 
     if (statusElement) {
-      statusElement.textContent = "Lead saved on this browser. Backend email sending is not connected yet.";
+      statusElement.textContent = "Online sending is unavailable, so an email draft was opened and the lead was saved on this browser.";
     }
 
     console.error(error);
   }
+}
+
+function openLeadEmailFallback(lead) {
+  const subject = encodeURIComponent("New MyDreamHouse Lead");
+  const body = encodeURIComponent([
+    "New MyDreamHouse lead",
+    "",
+    `Name: ${lead.name || ""}`,
+    `Email: ${lead.email || ""}`,
+    `Phone: ${lead.phone || ""}`,
+    `Property: ${lead.property || ""}`,
+    `Message: ${lead.message || lead.notes || ""}`,
+    `Source: ${lead.source || ""}`,
+    `Page: ${lead.page || window.location.href}`,
+    `Created: ${lead.createdAt || new Date().toISOString()}`
+  ].join("\n"));
+
+  window.location.href = `mailto:misaelpeguero@yahoo.com?subject=${subject}&body=${body}`;
 }
 
 async function submitLeadWithFormSubmit(lead) {
