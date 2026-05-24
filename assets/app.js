@@ -17,6 +17,7 @@ const elements = {
   loginUser: document.querySelector("#loginUser"),
   loginPassword: document.querySelector("#loginPassword"),
   loginStatus: document.querySelector("#loginStatus"),
+  beachSoundButton: document.querySelector("#beachSoundButton"),
   idxFrame: document.querySelector("#idxFrame"),
   searchForm: document.querySelector("#searchForm"),
   queryInput: document.querySelector("#queryInput"),
@@ -47,6 +48,7 @@ const loginCredentials = {
   username: "Peguero26",
   password: "MyHouse26"
 };
+let beachAudio = null;
 const matrixIdxUrl = "https://sef.mlsmatrix.com/Matrix/public/IDX.aspx?idx=988b1ef6";
 const mlsRefreshInterval = 60 * 60 * 1000;
 const citiesByCounty = {
@@ -209,6 +211,70 @@ function bindLogin() {
 
     elements.loginStatus.textContent = "Incorrect username or password.";
   });
+
+  elements.beachSoundButton.addEventListener("click", () => {
+    if (beachAudio) {
+      beachAudio.stop();
+      beachAudio = null;
+      elements.beachSoundButton.textContent = "Beach Sound";
+      return;
+    }
+
+    beachAudio = createBeachSound();
+    beachAudio.start();
+    elements.beachSoundButton.textContent = "Stop Sound";
+  });
+}
+
+function createBeachSound() {
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  const context = new AudioContext();
+  const master = context.createGain();
+  const noiseGain = context.createGain();
+  const waveGain = context.createGain();
+  const filter = context.createBiquadFilter();
+  const waveOscillator = context.createOscillator();
+  const waveShape = context.createGain();
+
+  const buffer = context.createBuffer(1, context.sampleRate * 2, context.sampleRate);
+  const channel = buffer.getChannelData(0);
+  for (let index = 0; index < channel.length; index += 1) {
+    channel[index] = Math.random() * 2 - 1;
+  }
+
+  const noise = context.createBufferSource();
+  noise.buffer = buffer;
+  noise.loop = true;
+
+  filter.type = "lowpass";
+  filter.frequency.value = 850;
+  filter.Q.value = 0.8;
+  noiseGain.gain.value = 0.08;
+  waveGain.gain.value = 0.035;
+  master.gain.value = 0.28;
+
+  waveOscillator.type = "sine";
+  waveOscillator.frequency.value = 0.13;
+  waveShape.gain.value = 0.05;
+
+  waveOscillator.connect(waveShape);
+  waveShape.connect(noiseGain.gain);
+  noise.connect(filter);
+  filter.connect(noiseGain);
+  noiseGain.connect(master);
+  master.connect(context.destination);
+
+  return {
+    start() {
+      noise.start();
+      waveOscillator.start();
+    },
+    stop() {
+      noise.stop();
+      waveOscillator.stop();
+      context.close();
+    }
+  };
 }
 
 function updateCityOptions() {
