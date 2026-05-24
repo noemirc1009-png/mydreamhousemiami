@@ -189,7 +189,7 @@ function bindEvents() {
     alert.createdAt = new Date().toISOString();
 
     try {
-      const response = await fetch("/api/search-alerts", {
+      const response = await fetch(apiUrl("/api/search-alerts"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(alert)
@@ -355,7 +355,7 @@ async function submitLead(lead, statusElement, formElement) {
   };
 
   try {
-    const response = await fetch("/api/leads", {
+    const response = await fetch(apiUrl("/api/leads"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(leadWithTime)
@@ -591,8 +591,13 @@ async function loadListings() {
   }
 }
 
+function apiUrl(path) {
+  const baseUrl = window.MLS_CONFIG?.apiBaseUrl || "";
+  return baseUrl ? new URL(path, baseUrl).toString() : path;
+}
+
 function buildListingsUrl() {
-  const url = new URL(window.MLS_CONFIG.endpoint, window.location.href);
+  const url = new URL(window.MLS_CONFIG.endpoint, window.MLS_CONFIG?.apiBaseUrl || window.location.href);
   const query = elements.queryInput?.value.trim() || "";
   if (query) url.searchParams.set("city", query);
   return url;

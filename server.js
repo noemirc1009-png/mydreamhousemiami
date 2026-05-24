@@ -46,6 +46,10 @@ const mimeTypes = {
 
 const server = http.createServer(async (request, response) => {
   try {
+    if (request.method === "OPTIONS") {
+      return sendCorsPreflight(response);
+    }
+
     const requestUrl = new URL(request.url, `http://${request.headers.host}`);
 
     if (requestUrl.pathname === "/api/health") {
@@ -226,14 +230,28 @@ function sendJson(response, status, payload, headers = {}) {
   response.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
+    ...corsHeaders(),
     ...headers
   });
   response.end(JSON.stringify(payload));
 }
 
 function sendText(response, status, body) {
-  response.writeHead(status, { "Content-Type": "text/plain; charset=utf-8" });
+  response.writeHead(status, { "Content-Type": "text/plain; charset=utf-8", ...corsHeaders() });
   response.end(body);
+}
+
+function sendCorsPreflight(response) {
+  response.writeHead(204, corsHeaders());
+  response.end();
+}
+
+function corsHeaders() {
+  return {
+    "Access-Control-Allow-Origin": process.env.CORS_ORIGIN || "*",
+    "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization"
+  };
 }
 
 function readJsonBody(request) {
