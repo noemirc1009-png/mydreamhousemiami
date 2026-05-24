@@ -73,6 +73,20 @@ EMAIL_WEBHOOK_URL="https://your-email-or-crm-webhook"
 LEAD_RECIPIENT_EMAIL="your-email@example.com"
 ```
 
+Or send directly through Yahoo Mail SMTP:
+
+```text
+LEAD_RECIPIENT_EMAIL="misaelpeguero@yahoo.com"
+SMTP_HOST="smtp.mail.yahoo.com"
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER="misaelpeguero@yahoo.com"
+SMTP_PASS="your Yahoo app password"
+SMTP_FROM="misaelpeguero@yahoo.com"
+```
+
+Use a Yahoo app password for `SMTP_PASS`, not your normal Yahoo login password. Add it only in Render environment variables.
+
 The backend sends webhook events for:
 
 ```text

@@ -14,3 +14,15 @@ services:
         sync: false
       - key: LEAD_RECIPIENT_EMAIL
         value: "misaelpeguero@yahoo.com"
+      - key: SMTP_HOST
+        value: "smtp.mail.yahoo.com"
+      - key: SMTP_PORT
+        value: "465"
+      - key: SMTP_SECURE
+        value: "true"
+      - key: SMTP_USER
+        value: "misaelpeguero@yahoo.com"
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        value: "misaelpeguero@yahoo.com"

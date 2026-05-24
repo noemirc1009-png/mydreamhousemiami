@@ -2,6 +2,13 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 const { URL } = require("node:url");
+let nodemailer = null;
+
+try {
+  nodemailer = require("nodemailer");
+} catch (error) {
+  nodemailer = null;
+}
 
 loadDotEnv();
 
@@ -14,6 +21,12 @@ const MLS_PROVIDER = process.env.MLS_PROVIDER || "MLS feed";
 const CACHE_SECONDS = Number(process.env.MLS_CACHE_SECONDS || 1800);
 const EMAIL_WEBHOOK_URL = process.env.EMAIL_WEBHOOK_URL || "";
 const LEAD_RECIPIENT_EMAIL = process.env.LEAD_RECIPIENT_EMAIL || "";
+const SMTP_HOST = process.env.SMTP_HOST || "";
+const SMTP_PORT = Number(process.env.SMTP_PORT || 465);
+const SMTP_SECURE = String(process.env.SMTP_SECURE || "true") !== "false";
+const SMTP_USER = process.env.SMTP_USER || "";
+const SMTP_PASS = process.env.SMTP_PASS || "";
+const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER || "";
 
 let cachedListings = null;
 let cachedAt = 0;
@@ -259,8 +272,6 @@ async function appendJsonRecord(filePath, record) {
 }
 
 async function forwardNotification(type, payload) {
-  if (!EMAIL_WEBHOOK_URL) return false;
-
   const notification = {
     type,
     source: "MYDreamHouse Peguero Real State.",
@@ -268,6 +279,10 @@ async function forwardNotification(type, payload) {
     createdAt: new Date().toISOString(),
     ...payload
   };
+
+  if (await sendSmtpEmail(notification)) return true;
+
+  if (!EMAIL_WEBHOOK_URL) return false;
 
   try {
     const response = await fetch(EMAIL_WEBHOOK_URL, {
@@ -286,6 +301,106 @@ async function forwardNotification(type, payload) {
     console.error("Email webhook failed.", error);
     return false;
   }
+}
+
+async function sendSmtpEmail(notification) {
+  if (!nodemailer || !SMTP_HOST || !SMTP_USER || !SMTP_PASS || !LEAD_RECIPIENT_EMAIL) return false;
+
+  const transporter = nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_SECURE,
+    auth: {
+      user: SMTP_USER,
+      pass: SMTP_PASS
+    }
+  });
+
+  const subject = notification.type === "search_alert_created"
+    ? "New MyDreamHouse Search Alert"
+    : "New MyDreamHouse Lead";
+
+  try {
+    await transporter.sendMail({
+      from: SMTP_FROM,
+      to: LEAD_RECIPIENT_EMAIL,
+      subject,
+      text: formatEmailText(notification),
+      html: formatEmailHtml(notification)
+    });
+    return true;
+  } catch (error) {
+    console.error("SMTP email failed.", error);
+    return false;
+  }
+}
+
+function formatEmailText(notification) {
+  const data = notification.lead || notification.alert || {};
+  return [
+    notification.source,
+    `Type: ${notification.type}`,
+    `Created: ${notification.createdAt}`,
+    "",
+    `Name: ${data.name || ""}`,
+    `Email: ${data.email || ""}`,
+    `Phone: ${data.phone || ""}`,
+    `Property: ${data.property || ""}`,
+    `Location: ${data.location || ""}`,
+    `Price: ${data.minPrice || ""} - ${data.maxPrice || ""}`,
+    `Beds: ${data.beds || ""}`,
+    `HOA: ${data.hoa || ""}`,
+    `Frequency: ${data.frequency || ""}`,
+    "",
+    `Message: ${data.message || data.notes || ""}`,
+    "",
+    `Page: ${data.page || ""}`,
+    `Record ID: ${data.id || ""}`
+  ].join("\n");
+}
+
+function formatEmailHtml(notification) {
+  const data = notification.lead || notification.alert || {};
+  const rows = [
+    ["Type", notification.type],
+    ["Created", notification.createdAt],
+    ["Name", data.name],
+    ["Email", data.email],
+    ["Phone", data.phone],
+    ["Property", data.property],
+    ["Location", data.location],
+    ["Min Price", data.minPrice],
+    ["Max Price", data.maxPrice],
+    ["Beds", data.beds],
+    ["HOA", data.hoa],
+    ["Frequency", data.frequency],
+    ["Message", data.message || data.notes],
+    ["Page", data.page],
+    ["Record ID", data.id]
+  ];
+
+  return `
+    <div style="font-family: Arial, sans-serif; color: #10252c;">
+      <h2 style="margin: 0 0 12px;">${escapeHtml(notification.source)}</h2>
+      <table cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+        ${rows.map(([label, value]) => `
+          <tr>
+            <td style="border: 1px solid #d8d1bd; font-weight: 700; width: 150px;">${escapeHtml(label)}</td>
+            <td style="border: 1px solid #d8d1bd;">${escapeHtml(value || "")}</td>
+          </tr>
+        `).join("")}
+      </table>
+    </div>
+  `;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function loadDotEnv() {
