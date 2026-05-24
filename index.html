@@ -7,6 +7,26 @@
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
+  <section class="login-gate" id="loginGate" aria-label="Website login">
+    <form class="login-panel" id="loginForm">
+      <span class="brand-mark">MDH</span>
+      <div>
+        <span class="eyebrow">Private Access</span>
+        <h1>MYDreamHouse Peguero Real State.</h1>
+      </div>
+      <label>
+        <span>Username</span>
+        <input required id="loginUser" autocomplete="username" placeholder="Username">
+      </label>
+      <label>
+        <span>Password</span>
+        <input required id="loginPassword" type="password" autocomplete="current-password" placeholder="Password">
+      </label>
+      <button class="primary-button" type="submit">Enter Website</button>
+      <p id="loginStatus" class="form-status" role="status"></p>
+    </form>
+  </section>
+
   <header class="topbar">
     <a class="brand" href="./" aria-label="MYDreamHouse Peguero Real State home">
       <span class="brand-mark">MDH</span>

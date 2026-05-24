@@ -12,6 +12,11 @@ const currency = new Intl.NumberFormat("en-US", {
 });
 
 const elements = {
+  loginGate: document.querySelector("#loginGate"),
+  loginForm: document.querySelector("#loginForm"),
+  loginUser: document.querySelector("#loginUser"),
+  loginPassword: document.querySelector("#loginPassword"),
+  loginStatus: document.querySelector("#loginStatus"),
   idxFrame: document.querySelector("#idxFrame"),
   searchForm: document.querySelector("#searchForm"),
   queryInput: document.querySelector("#queryInput"),
@@ -38,6 +43,10 @@ const elements = {
   alertStatus: document.querySelector("#alertStatus")
 };
 
+const loginCredentials = {
+  username: "peguero",
+  password: "dreamhouse2026"
+};
 const matrixIdxUrl = "https://sef.mlsmatrix.com/Matrix/public/IDX.aspx?idx=988b1ef6";
 const mlsRefreshInterval = 60 * 60 * 1000;
 const citiesByCounty = {
@@ -113,6 +122,8 @@ async function init() {
 }
 
 function bindEvents() {
+  bindLogin();
+
   if (elements.searchForm) {
     elements.searchForm.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -176,6 +187,27 @@ function bindEvents() {
     }
 
     elements.alertForm.reset();
+  });
+}
+
+function bindLogin() {
+  if (sessionStorage.getItem("mdhLoggedIn") === "true") {
+    elements.loginGate.classList.add("hidden");
+  }
+
+  elements.loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const username = elements.loginUser.value.trim();
+    const password = elements.loginPassword.value;
+
+    if (username === loginCredentials.username && password === loginCredentials.password) {
+      sessionStorage.setItem("mdhLoggedIn", "true");
+      elements.loginGate.classList.add("hidden");
+      elements.loginForm.reset();
+      return;
+    }
+
+    elements.loginStatus.textContent = "Incorrect username or password.";
   });
 }
 

@@ -31,6 +31,10 @@ body {
   font-family: "Trebuchet MS", "Segoe UI", Arial, Helvetica, sans-serif;
 }
 
+body:has(.login-gate:not(.hidden)) {
+  overflow: hidden;
+}
+
 button,
 input,
 select,
@@ -51,6 +55,49 @@ textarea {
   background: rgba(255, 255, 255, 0.88);
   border-bottom: 1px solid var(--line);
   backdrop-filter: blur(14px);
+}
+
+.login-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background:
+    linear-gradient(180deg, rgba(8, 47, 58, 0.68), rgba(8, 47, 58, 0.44)),
+    radial-gradient(circle at 20% 14%, rgba(255, 242, 207, 0.34), transparent 28%),
+    url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=80") center/cover;
+  backdrop-filter: blur(8px);
+}
+
+.login-gate.hidden {
+  display: none;
+}
+
+.login-panel {
+  display: grid;
+  gap: 16px;
+  width: min(440px, 100%);
+  padding: 26px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 242, 207, 0.72);
+  border-radius: 8px;
+  box-shadow: 0 30px 70px rgba(8, 47, 58, 0.3);
+  backdrop-filter: blur(18px);
+}
+
+.login-panel .brand-mark {
+  width: 54px;
+  height: 54px;
+}
+
+.login-panel h1 {
+  margin: 0;
+  color: var(--green-dark);
+  font-size: clamp(30px, 5vw, 44px);
+  line-height: 0.98;
 }
 
 .brand {
