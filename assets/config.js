@@ -3,5 +3,6 @@ window.MLS_CONFIG = {
   provider: "MIAMI REALTORS / Bridge API",
   apiBaseUrl: "https://mydreamhousemiami.onrender.com",
   endpoint: "/api/listings",
-  apiKey: ""
+  apiKey: "",
+  web3FormsAccessKey: ""
 };

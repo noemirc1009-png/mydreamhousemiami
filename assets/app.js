@@ -354,6 +354,15 @@ async function submitLead(lead, statusElement, formElement) {
     createdAt: lead.createdAt || new Date().toISOString()
   };
 
+  const sentByWeb3Forms = await submitLeadWithWeb3Forms(leadWithTime);
+  if (sentByWeb3Forms) {
+    if (statusElement) {
+      statusElement.textContent = "Lead sent. We will contact you soon.";
+    }
+    if (formElement) formElement.reset();
+    return;
+  }
+
   try {
     const response = await fetch(apiUrl("/api/leads"), {
       method: "POST",
@@ -388,10 +397,46 @@ async function submitLead(lead, statusElement, formElement) {
     localStorage.setItem("mdhPendingLeads", JSON.stringify(savedLeads));
 
     if (statusElement) {
-      statusElement.textContent = "Online sending is unavailable, so an email draft was opened and the lead was saved on this browser.";
+      statusElement.textContent = window.MLS_CONFIG?.web3FormsAccessKey
+        ? "Online sending is unavailable, so an email draft was opened and the lead was saved on this browser."
+        : "Add the free Web3Forms access key to activate automatic email. An email draft was opened as backup.";
     }
 
     console.error(error);
+  }
+}
+
+async function submitLeadWithWeb3Forms(lead) {
+  const accessKey = window.MLS_CONFIG?.web3FormsAccessKey || "";
+  if (!accessKey) return false;
+
+  try {
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify({
+        access_key: accessKey,
+        subject: "New MyDreamHouse Lead",
+        from_name: "MYDreamHouse Peguero Real State",
+        botcheck: "",
+        source: lead.source || "website",
+        createdAt: lead.createdAt || "",
+        name: lead.name || "",
+        email: lead.email || "",
+        phone: lead.phone || "",
+        property: lead.property || "",
+        message: lead.message || lead.notes || "",
+        page: lead.page || window.location.href
+      })
+    });
+    const result = await response.json().catch(() => ({}));
+    return response.ok && result.success !== false;
+  } catch (error) {
+    console.error(error);
+    return false;
   }
 }
 

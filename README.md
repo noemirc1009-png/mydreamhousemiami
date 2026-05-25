@@ -95,6 +95,19 @@ FORMSUBMIT_EMAIL="misaelpeguero@yahoo.com"
 
 The first FormSubmit email may ask you to confirm/activate the address. After confirming, new contact form and bot leads should forward to that email.
 
+For the static GitHub Pages site, the recommended free option is Web3Forms:
+
+1. Go to `https://web3forms.com`.
+2. Enter `misaelpeguero@yahoo.com` and get a free access key.
+3. Open `assets/config.js`.
+4. Paste the key into:
+
+```js
+web3FormsAccessKey: "your-access-key"
+```
+
+After pushing that change, contact form and bot leads send directly from the website to `misaelpeguero@yahoo.com`.
+
 The backend sends webhook events for:
 
 ```text
