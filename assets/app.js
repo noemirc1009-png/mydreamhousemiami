@@ -2,7 +2,8 @@ const state = {
   listings: [],
   filtered: [],
   favorites: new Set(JSON.parse(localStorage.getItem("mdhFavorites") || "[]")),
-  activeView: "idx"
+  activeView: "idx",
+  botLead: {}
 };
 
 const currency = new Intl.NumberFormat("en-US", {
@@ -234,7 +235,7 @@ function bindChatbot() {
     button.addEventListener("click", () => handleBotPrompt(button.dataset.botPrompt));
   });
 
-  addBotMessage("Hi, I am the MyDreamHouse assistant. I can help with showings, saved searches, favorites, and Miami-area home questions.");
+  addBotMessage("Hi, I am the MyDreamHouse assistant. Are you buying, selling, renting, or looking for a showing?");
 }
 
 function toggleChatbot(open) {
@@ -251,6 +252,7 @@ function handleBotPrompt(rawPrompt) {
 
   addUserMessage(prompt);
   elements.chatbotInput.value = "";
+  updateBotLead(prompt);
 
   window.setTimeout(() => {
     const reply = getBotReply(prompt);
@@ -277,17 +279,32 @@ function addChatMessage(message, type) {
 
 function getBotReply(prompt) {
   const text = prompt.toLowerCase();
+  const lead = state.botLead;
+
+  if (text.includes("reset") || text.includes("start over")) {
+    state.botLead = {};
+    return {
+      message: "No problem. Let us start fresh. Are you buying, selling, renting, or looking for a showing?"
+    };
+  }
 
   if (text.includes("showing") || text.includes("tour") || text.includes("appointment") || text.includes("visit")) {
+    lead.intent = "showing";
+    const missing = nextMissingLeadField();
     return {
-      message: "Perfect. I opened the contact form so you can request a showing. Add the address or MLS number and your preferred time.",
-      action: () => switchView("contact")
+      message: missing
+        ? `Perfect. I can help schedule a showing. What is your ${missing}?`
+        : "Perfect. I have the showing details. I am sending this to Misael now.",
+      action: () => missing ? switchView("contact") : sendBotLeadSummary()
     };
   }
 
   if (text.includes("alert") || text.includes("email") || text.includes("saved search") || text.includes("automatic")) {
+    lead.intent = "search alert";
     return {
-      message: "I opened Search Alerts. Your client can enter city, price, beds, HOA preference, and frequency for automated listing emails.",
+      message: lead.location
+        ? "Good. I opened Search Alerts so the search can be saved with city, price, beds, HOA, and frequency."
+        : "I opened Search Alerts. Start with the city or ZIP where you want listings.",
       action: () => switchView("alerts")
     };
   }
@@ -308,26 +325,50 @@ function getBotReply(prompt) {
 
   if (text.includes("hoa")) {
     return {
-      message: "For HOA, use Search Alerts to request a maximum HOA or No HOA. The live MLS Matrix window also has the official MLS criteria filters."
+      message: "For HOA, I can track No HOA or a maximum monthly HOA. Tell me something like: no HOA, HOA under 500, or any HOA."
     };
   }
 
   if (text.includes("price") || text.includes("budget") || text.includes("pre approval") || text.includes("preapproval")) {
     return {
-      message: "I can help narrow a search by budget. For a serious purchase, get pre-approved first, then use Search Alerts with your price range and preferred city."
+      message: lead.budget
+        ? `I have your budget as ${lead.budget}. Do you already have a pre-approval, or do you need help getting ready?`
+        : "What price range are you comfortable with? Example: 500k to 800k."
     };
   }
 
   if (looksLikeLead(prompt)) {
-    saveBotLead(prompt);
+    updateBotLead(prompt);
+    if (hasEnoughBotLead()) {
+      sendBotLeadSummary();
+      return {
+        message: "Thank you. I sent your information to Misael. He can follow up with the best next step.",
+        action: () => switchView("contact")
+      };
+    }
     return {
-      message: "Thank you. I saved your message as a lead on this browser. For faster service, open Contact and send your name, email, and property details.",
+      message: `Thank you. I have your contact. What city, budget, and type of home are you looking for?`,
       action: () => switchView("contact")
     };
   }
 
+  if (hasEnoughBotLead()) {
+    sendBotLeadSummary();
+    return {
+      message: "I have enough information to help. I sent your request to Misael and opened the contact page in case you want to add more details.",
+      action: () => switchView("contact")
+    };
+  }
+
+  const missing = nextMissingLeadField();
+  if (missing) {
+    return {
+      message: smartFollowUp(missing)
+    };
+  }
+
   return {
-    message: "I can help with: schedule a showing, create a search alert, search MLS homes, explain HOA options, or open favorites. What would you like to do?"
+    message: "I can help with buying, selling, renting, showings, MLS search, HOA, and saved alerts. Tell me your city, budget, bedrooms, and when you want to move."
   };
 }
 
@@ -335,9 +376,106 @@ function looksLikeLead(text) {
   return /\b[\w.%+-]+@[\w.-]+\.[a-z]{2,}\b/i.test(text) || /\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/.test(text);
 }
 
-function saveBotLead(message) {
+function updateBotLead(prompt) {
+  const text = prompt.toLowerCase();
+  const lead = state.botLead;
+  lead.transcript = [...(lead.transcript || []), prompt].slice(-8);
+
+  if (text.includes("buy") || text.includes("buyer") || text.includes("purchase")) lead.intent = "buyer";
+  if (text.includes("sell") || text.includes("seller") || text.includes("list my")) lead.intent = "seller";
+  if (text.includes("rent") || text.includes("rental") || text.includes("lease")) lead.intent = "renter";
+  if (text.includes("showing") || text.includes("tour") || text.includes("visit")) lead.intent = "showing";
+
+  const email = prompt.match(/\b[\w.%+-]+@[\w.-]+\.[a-z]{2,}\b/i);
+  if (email) lead.email = email[0];
+
+  const phone = prompt.match(/\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/);
+  if (phone) lead.phone = phone[0];
+
+  const beds = text.match(/\b([1-9])\s*(?:bed|beds|bedroom|bedrooms|br)\b/);
+  if (beds) lead.beds = `${beds[1]}+ beds`;
+
+  const budget = prompt.match(/\$?\s?\d{3,}(?:,\d{3})*(?:\s?(?:k|m|million))?(?:\s?(?:-|to)\s?\$?\s?\d{3,}(?:,\d{3})*(?:\s?(?:k|m|million))?)?/i);
+  if (budget && /price|budget|\$|k|million|m\b|to|-/.test(text)) lead.budget = budget[0].trim();
+
+  const locations = Object.values(citiesByCounty).flat();
+  const location = locations.find((city) => text.includes(city.toLowerCase()));
+  if (location) lead.location = location;
+
+  if (text.includes("condo")) lead.propertyType = "Condo";
+  if (text.includes("townhouse") || text.includes("townhome")) lead.propertyType = "Townhouse";
+  if (text.includes("single family") || text.includes("house")) lead.propertyType = "Single Family";
+  if (text.includes("waterfront") || text.includes("water front")) lead.amenities = "Waterfront";
+  if (text.includes("pool")) lead.amenities = [lead.amenities, "Pool"].filter(Boolean).join(", ");
+  if (text.includes("no hoa")) lead.hoa = "No HOA";
+  if (text.includes("hoa under")) lead.hoa = prompt.match(/hoa under\s?\$?\d+/i)?.[0] || "HOA limit requested";
+  if (text.includes("cash")) lead.financing = "Cash";
+  if (text.includes("pre approved") || text.includes("pre-approved") || text.includes("preapproval")) lead.financing = "Pre-approved";
+
+  const timelineWords = ["today", "tomorrow", "this week", "weekend", "month", "soon", "asap", "30 days", "60 days", "90 days"];
+  const timeline = timelineWords.find((word) => text.includes(word));
+  if (timeline) lead.timeline = timeline;
+}
+
+function nextMissingLeadField() {
+  const lead = state.botLead;
+  if (!lead.intent) return "goal";
+  if (!lead.location && lead.intent !== "seller") return "city or ZIP";
+  if (!lead.budget && lead.intent !== "seller") return "budget";
+  if (!lead.beds && ["buyer", "renter", "search alert"].includes(lead.intent)) return "bedrooms";
+  if (!lead.timeline) return "timeline";
+  if (!lead.email && !lead.phone) return "email or phone";
+  return "";
+}
+
+function smartFollowUp(field) {
+  const prompts = {
+    goal: "Are you buying, selling, renting, or scheduling a showing?",
+    "city or ZIP": "Which city or ZIP do you prefer? For example Miami, Doral, Brickell, Aventura, or Coral Gables.",
+    budget: "What budget or price range should I use? Example: 600k to 900k.",
+    bedrooms: "How many bedrooms do you need?",
+    timeline: "When would you like to move or see homes: this week, this month, or later?",
+    "email or phone": "What email or phone number should Misael use to contact you?"
+  };
+  return prompts[field] || "Tell me a little more so I can help.";
+}
+
+function hasEnoughBotLead() {
+  const lead = state.botLead;
+  return Boolean((lead.email || lead.phone) && (lead.intent || lead.location || lead.budget || lead.propertyType));
+}
+
+function sendBotLeadSummary() {
+  const lead = state.botLead;
+  const summary = [
+    `Intent: ${lead.intent || ""}`,
+    `Location: ${lead.location || ""}`,
+    `Budget: ${lead.budget || ""}`,
+    `Beds: ${lead.beds || ""}`,
+    `Property Type: ${lead.propertyType || ""}`,
+    `Amenities: ${lead.amenities || ""}`,
+    `HOA: ${lead.hoa || ""}`,
+    `Financing: ${lead.financing || ""}`,
+    `Timeline: ${lead.timeline || ""}`,
+    `Email: ${lead.email || ""}`,
+    `Phone: ${lead.phone || ""}`,
+    "",
+    "Conversation:",
+    ...(lead.transcript || [])
+  ].join("\n");
+  saveBotLead(summary, {
+    email: lead.email || "",
+    phone: lead.phone || "",
+    property: lead.location || "",
+    name: lead.name || ""
+  });
+  state.botLead = {};
+}
+
+function saveBotLead(message, details = {}) {
   const leads = JSON.parse(localStorage.getItem("mdhBotLeads") || "[]");
   const lead = {
+    ...details,
     message,
     source: "chatbot",
     page: window.location.href,
