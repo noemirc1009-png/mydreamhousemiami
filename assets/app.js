@@ -662,17 +662,32 @@ function updateBotLead(prompt) {
   if (normalized.includes("cash")) lead.financing = "Cash";
   if (normalized.includes("pre approved") || normalized.includes("pre-approved") || normalized.includes("preapproval")) lead.financing = "Pre-approved";
 
-  const timelineWords = ["today", "tomorrow", "this week", "next week", "this month", "weekend", "month", "week", "soon", "asap", "30 days", "60 days", "90 days", "later"];
-  const timeline = timelineWords.find((word) => normalized.includes(word));
+  const timeline = detectLooseTimeline(normalized);
   if (timeline) lead.timeline = timeline;
 }
 
 function detectLooseTimeline(text) {
+  const weekday = text.match(/\b(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/);
+  if (weekday) return titleCase(weekday[1]);
+
+  const monthDate = text.match(/\b(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec)\.?\s+([0-3]?\d)(?:st|nd|rd|th)?\b/);
+  if (monthDate) return `${titleCase(monthDate[1])} ${monthDate[2]}`;
+
+  const numericDate = text.match(/\b([0-1]?\d)[/-]([0-3]?\d)(?:[/-](\d{2,4}))?\b/);
+  if (numericDate) return numericDate[0];
+
+  const dayOfMonth = text.match(/\b(?:on\s+)?(?:the\s+)?([0-3]?\d)(?:st|nd|rd|th)\b/);
+  if (dayOfMonth) return `Day ${dayOfMonth[1]}`;
+
   if (text.includes("next") && text.includes("week")) return "next week";
+  if (text.includes("next") && text.includes("month")) return "next month";
   if (text.includes("this") && text.includes("month")) return "this month";
   if (text.includes("this") && text.includes("week")) return "this week";
   if (text.trim() === "week" || text.includes("in a week")) return "next week";
+  if (text.trim() === "month" || text.includes("in a month")) return "next month";
   if (text.includes("weekend")) return "weekend";
+  if (text.includes("today")) return "today";
+  if (text.includes("tomorrow")) return "tomorrow";
   if (text.includes("soon") || text.includes("asap")) return "soon";
   if (text.includes("later")) return "later";
   if (/\b30\b/.test(text)) return "30 days";
@@ -682,11 +697,19 @@ function detectLooseTimeline(text) {
   return "";
 }
 
+function titleCase(value) {
+  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+}
+
 function normalizeBotText(value) {
   return String(value)
     .toLowerCase()
     .replace(/\bmont\b|\bmonht\b|\bmoth\b|\bmnth\b/g, "month")
+    .replace(/\bmonts\b|\bmonhts\b|\bmoths\b|\bmnths\b/g, "months")
     .replace(/\bnexxt\b|\bnextt\b|\bnxt\b/g, "next")
+    .replace(/\bwee+k\b/g, "week")
+    .replace(/\bweaks\b|\bweeks\b/g, "week")
+    .replace(/\bmo+nths?\b/g, "month")
     .replace(/\bths\b|\bdis\b/g, "this")
     .replace(/\btomorow\b|\btommorow\b/g, "tomorrow")
     .replace(/\bweak\b/g, "week")
@@ -721,7 +744,7 @@ function smartFollowUp(field) {
     "city or ZIP": "Which city or ZIP do you prefer? For example Miami, Doral, Brickell, Aventura, or Coral Gables.",
     budget: "What budget or price range should I use? Example: 600k to 900k.",
     bedrooms: "How many bedrooms do you need?",
-    timeline: "When would you like to move or see homes: this week, next week, this month, or later?",
+    timeline: "When would you like to move or see homes: this week, next week, this month, next month, or a specific day?",
     "email or phone": "What email or phone number should Misael use to contact you?"
   };
   return prompts[field] || "Tell me a little more so I can help.";
