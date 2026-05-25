@@ -15,8 +15,9 @@ const currency = new Intl.NumberFormat("en-US", {
 const elements = {
   loginGate: document.querySelector("#loginGate"),
   loginForm: document.querySelector("#loginForm"),
-  loginUser: document.querySelector("#loginUser"),
-  loginPassword: document.querySelector("#loginPassword"),
+  registrationName: document.querySelector("#registrationName"),
+  registrationPhone: document.querySelector("#registrationPhone"),
+  registrationEmail: document.querySelector("#registrationEmail"),
   loginStatus: document.querySelector("#loginStatus"),
   idxFrame: document.querySelector("#idxFrame"),
   searchForm: document.querySelector("#searchForm"),
@@ -58,10 +59,6 @@ const elements = {
   chatbotInput: document.querySelector("#chatbotInput")
 };
 
-const loginCredentials = {
-  username: "Peguero26",
-  password: "MyHouse26"
-};
 let beachAudio = null;
 const matrixIdxUrl = "https://sef.mlsmatrix.com/Matrix/public/IDX.aspx?idx=988b1ef6";
 const mlsRefreshInterval = 30 * 60 * 1000;
@@ -1188,7 +1185,7 @@ function hideNewListingPop() {
 }
 
 function bindLogin() {
-  if (sessionStorage.getItem("mdhLoggedIn") === "true") {
+  if (sessionStorage.getItem("mdhRegistered") === "true") {
     elements.loginGate.classList.add("hidden");
   }
 
@@ -1196,19 +1193,40 @@ function bindLogin() {
   elements.loginGate.addEventListener("pointerdown", startBeachSound, { once: true });
   elements.loginGate.addEventListener("keydown", startBeachSound, { once: true });
 
-  elements.loginForm.addEventListener("submit", (event) => {
+  elements.loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const username = elements.loginUser.value.trim();
-    const password = elements.loginPassword.value;
+    const name = elements.registrationName.value.trim();
+    const phone = elements.registrationPhone.value.trim();
+    const email = elements.registrationEmail.value.trim();
 
-    if (username === loginCredentials.username && password === loginCredentials.password) {
-      sessionStorage.setItem("mdhLoggedIn", "true");
-      elements.loginGate.classList.add("hidden");
-      elements.loginForm.reset();
+    if (!name || !phone || !email) {
+      elements.loginStatus.textContent = "Please complete name, phone, and email.";
       return;
     }
 
-    elements.loginStatus.textContent = "Incorrect username or password.";
+    elements.loginStatus.textContent = "Opening website...";
+    const registrationLead = {
+      name,
+      phone,
+      email,
+      source: "registration gate",
+      property: "Website registration",
+      message: [
+        "New MyDreamHouse website registration",
+        "",
+        `Name: ${name}`,
+        `Phone: ${phone}`,
+        `Email: ${email}`
+      ].join("\n"),
+      page: window.location.href,
+      createdAt: new Date().toISOString()
+    };
+
+    localStorage.setItem("mdhClientRegistration", JSON.stringify(registrationLead));
+    sessionStorage.setItem("mdhRegistered", "true");
+    elements.loginGate.classList.add("hidden");
+    elements.loginForm.reset();
+    submitLead(registrationLead);
   });
 }
 

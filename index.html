@@ -7,20 +7,24 @@
   <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <section class="login-gate" id="loginGate" aria-label="Website login">
+  <section class="login-gate" id="loginGate" aria-label="Client registration">
     <form class="login-panel" id="loginForm">
       <span class="brand-mark">MDH</span>
       <div>
-        <span class="eyebrow">Private Access</span>
+        <span class="eyebrow">Client Registration</span>
         <h1>MYDreamHouse Peguero Real State.</h1>
       </div>
       <label>
-        <span>Username</span>
-        <input required id="loginUser" autocomplete="username" placeholder="Username">
+        <span>Client Name</span>
+        <input required id="registrationName" name="name" autocomplete="name" placeholder="Full name">
       </label>
       <label>
-        <span>Password</span>
-        <input required id="loginPassword" type="password" autocomplete="current-password" placeholder="Password">
+        <span>Phone Number</span>
+        <input required id="registrationPhone" name="phone" autocomplete="tel" inputmode="tel" placeholder="305-555-1212">
+      </label>
+      <label>
+        <span>Email</span>
+        <input required id="registrationEmail" name="email" type="email" autocomplete="email" placeholder="you@email.com">
       </label>
       <button class="primary-button" type="submit">Enter Website</button>
       <p id="loginStatus" class="form-status" role="status"></p>
@@ -307,8 +311,8 @@
     </article>
   </template>
 
-  <script src="assets/config.js?v=20260524-contactrequired"></script>
+  <script src="assets/config.js?v=20260524-registration"></script>
   <script src="assets/listings.js"></script>
-  <script src="assets/app.js?v=20260524-contactrequired"></script>
+  <script src="assets/app.js?v=20260524-registration"></script>
 </body>
 </html>
