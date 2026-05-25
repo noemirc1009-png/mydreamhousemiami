@@ -127,6 +127,182 @@ const citiesByCounty = {
   ]
 };
 
+const zipLookup = {
+  "33010": { city: "Hialeah", county: "Miami-Dade" },
+  "33012": { city: "Hialeah", county: "Miami-Dade" },
+  "33013": { city: "Hialeah", county: "Miami-Dade" },
+  "33014": { city: "Hialeah", county: "Miami-Dade" },
+  "33015": { city: "Miami Lakes", county: "Miami-Dade" },
+  "33016": { city: "Hialeah", county: "Miami-Dade" },
+  "33018": { city: "Hialeah", county: "Miami-Dade" },
+  "33030": { city: "Homestead", county: "Miami-Dade" },
+  "33031": { city: "Homestead", county: "Miami-Dade" },
+  "33032": { city: "Homestead", county: "Miami-Dade" },
+  "33033": { city: "Homestead", county: "Miami-Dade" },
+  "33034": { city: "Florida City", county: "Miami-Dade" },
+  "33035": { city: "Homestead", county: "Miami-Dade" },
+  "33101": { city: "Miami", county: "Miami-Dade" },
+  "33109": { city: "Miami Beach", county: "Miami-Dade" },
+  "33125": { city: "Miami", county: "Miami-Dade" },
+  "33126": { city: "Miami", county: "Miami-Dade" },
+  "33127": { city: "Miami", county: "Miami-Dade" },
+  "33128": { city: "Miami", county: "Miami-Dade" },
+  "33129": { city: "Brickell", county: "Miami-Dade" },
+  "33130": { city: "Brickell", county: "Miami-Dade" },
+  "33131": { city: "Brickell", county: "Miami-Dade" },
+  "33132": { city: "Miami", county: "Miami-Dade" },
+  "33133": { city: "Coconut Grove", county: "Miami-Dade" },
+  "33134": { city: "Coral Gables", county: "Miami-Dade" },
+  "33135": { city: "Miami", county: "Miami-Dade" },
+  "33136": { city: "Miami", county: "Miami-Dade" },
+  "33137": { city: "Miami", county: "Miami-Dade" },
+  "33138": { city: "Miami", county: "Miami-Dade" },
+  "33139": { city: "Miami Beach", county: "Miami-Dade" },
+  "33140": { city: "Miami Beach", county: "Miami-Dade" },
+  "33141": { city: "Miami Beach", county: "Miami-Dade" },
+  "33142": { city: "Miami", county: "Miami-Dade" },
+  "33143": { city: "South Miami", county: "Miami-Dade" },
+  "33144": { city: "Miami", county: "Miami-Dade" },
+  "33145": { city: "Miami", county: "Miami-Dade" },
+  "33146": { city: "Coral Gables", county: "Miami-Dade" },
+  "33149": { city: "Key Biscayne", county: "Miami-Dade" },
+  "33154": { city: "Bal Harbour", county: "Miami-Dade" },
+  "33155": { city: "Miami", county: "Miami-Dade" },
+  "33156": { city: "Pinecrest", county: "Miami-Dade" },
+  "33157": { city: "Palmetto Bay", county: "Miami-Dade" },
+  "33160": { city: "Aventura", county: "Miami-Dade" },
+  "33161": { city: "North Miami", county: "Miami-Dade" },
+  "33162": { city: "North Miami Beach", county: "Miami-Dade" },
+  "33165": { city: "Miami", county: "Miami-Dade" },
+  "33166": { city: "Doral", county: "Miami-Dade" },
+  "33172": { city: "Doral", county: "Miami-Dade" },
+  "33173": { city: "Kendall", county: "Miami-Dade" },
+  "33174": { city: "Miami", county: "Miami-Dade" },
+  "33175": { city: "Miami", county: "Miami-Dade" },
+  "33176": { city: "Kendall", county: "Miami-Dade" },
+  "33178": { city: "Doral", county: "Miami-Dade" },
+  "33179": { city: "Aventura", county: "Miami-Dade" },
+  "33180": { city: "Aventura", county: "Miami-Dade" },
+  "33181": { city: "North Miami", county: "Miami-Dade" },
+  "33182": { city: "Miami", county: "Miami-Dade" },
+  "33183": { city: "Kendall", county: "Miami-Dade" },
+  "33184": { city: "Miami", county: "Miami-Dade" },
+  "33185": { city: "Miami", county: "Miami-Dade" },
+  "33186": { city: "Kendall", county: "Miami-Dade" },
+  "33187": { city: "Miami", county: "Miami-Dade" },
+  "33189": { city: "Cutler Bay", county: "Miami-Dade" },
+  "33190": { city: "Cutler Bay", county: "Miami-Dade" },
+  "33193": { city: "Kendall", county: "Miami-Dade" },
+  "33196": { city: "Kendall", county: "Miami-Dade" },
+  "33301": { city: "Fort Lauderdale", county: "Broward" },
+  "33304": { city: "Fort Lauderdale", county: "Broward" },
+  "33305": { city: "Wilton Manors", county: "Broward" },
+  "33308": { city: "Fort Lauderdale", county: "Broward" },
+  "33311": { city: "Fort Lauderdale", county: "Broward" },
+  "33312": { city: "Fort Lauderdale", county: "Broward" },
+  "33313": { city: "Lauderhill", county: "Broward" },
+  "33314": { city: "Davie", county: "Broward" },
+  "33315": { city: "Fort Lauderdale", county: "Broward" },
+  "33316": { city: "Fort Lauderdale", county: "Broward" },
+  "33317": { city: "Plantation", county: "Broward" },
+  "33319": { city: "Lauderhill", county: "Broward" },
+  "33321": { city: "Tamarac", county: "Broward" },
+  "33322": { city: "Sunrise", county: "Broward" },
+  "33323": { city: "Sunrise", county: "Broward" },
+  "33324": { city: "Plantation", county: "Broward" },
+  "33325": { city: "Davie", county: "Broward" },
+  "33326": { city: "Weston", county: "Broward" },
+  "33327": { city: "Weston", county: "Broward" },
+  "33328": { city: "Davie", county: "Broward" },
+  "33330": { city: "Davie", county: "Broward" },
+  "33331": { city: "Weston", county: "Broward" },
+  "33332": { city: "Weston", county: "Broward" },
+  "33004": { city: "Dania Beach", county: "Broward" },
+  "33009": { city: "Hallandale Beach", county: "Broward" },
+  "33019": { city: "Hollywood", county: "Broward" },
+  "33020": { city: "Hollywood", county: "Broward" },
+  "33021": { city: "Hollywood", county: "Broward" },
+  "33023": { city: "Miramar", county: "Broward" },
+  "33024": { city: "Pembroke Pines", county: "Broward" },
+  "33025": { city: "Miramar", county: "Broward" },
+  "33026": { city: "Pembroke Pines", county: "Broward" },
+  "33027": { city: "Miramar", county: "Broward" },
+  "33028": { city: "Pembroke Pines", county: "Broward" },
+  "33029": { city: "Pembroke Pines", county: "Broward" },
+  "33060": { city: "Pompano Beach", county: "Broward" },
+  "33062": { city: "Pompano Beach", county: "Broward" },
+  "33063": { city: "Margate", county: "Broward" },
+  "33064": { city: "Pompano Beach", county: "Broward" },
+  "33065": { city: "Coral Springs", county: "Broward" },
+  "33066": { city: "Coconut Creek", county: "Broward" },
+  "33067": { city: "Parkland", county: "Broward" },
+  "33068": { city: "North Lauderdale", county: "Broward" },
+  "33069": { city: "Pompano Beach", county: "Broward" },
+  "33071": { city: "Coral Springs", county: "Broward" },
+  "33073": { city: "Coconut Creek", county: "Broward" },
+  "33076": { city: "Parkland", county: "Broward" },
+  "33401": { city: "West Palm Beach", county: "Palm Beach" },
+  "33403": { city: "North Palm Beach", county: "Palm Beach" },
+  "33405": { city: "West Palm Beach", county: "Palm Beach" },
+  "33407": { city: "West Palm Beach", county: "Palm Beach" },
+  "33408": { city: "North Palm Beach", county: "Palm Beach" },
+  "33410": { city: "Palm Beach Gardens", county: "Palm Beach" },
+  "33411": { city: "Royal Palm Beach", county: "Palm Beach" },
+  "33414": { city: "Wellington", county: "Palm Beach" },
+  "33417": { city: "West Palm Beach", county: "Palm Beach" },
+  "33418": { city: "Palm Beach Gardens", county: "Palm Beach" },
+  "33426": { city: "Boynton Beach", county: "Palm Beach" },
+  "33428": { city: "Boca Raton", county: "Palm Beach" },
+  "33431": { city: "Boca Raton", county: "Palm Beach" },
+  "33432": { city: "Boca Raton", county: "Palm Beach" },
+  "33433": { city: "Boca Raton", county: "Palm Beach" },
+  "33434": { city: "Boca Raton", county: "Palm Beach" },
+  "33435": { city: "Boynton Beach", county: "Palm Beach" },
+  "33436": { city: "Boynton Beach", county: "Palm Beach" },
+  "33437": { city: "Boynton Beach", county: "Palm Beach" },
+  "33444": { city: "Delray Beach", county: "Palm Beach" },
+  "33445": { city: "Delray Beach", county: "Palm Beach" },
+  "33446": { city: "Delray Beach", county: "Palm Beach" },
+  "33458": { city: "Jupiter", county: "Palm Beach" },
+  "33469": { city: "Jupiter", county: "Palm Beach" },
+  "33477": { city: "Jupiter", county: "Palm Beach" },
+  "33480": { city: "Palm Beach", county: "Palm Beach" },
+  "33483": { city: "Delray Beach", county: "Palm Beach" },
+  "33486": { city: "Boca Raton", county: "Palm Beach" },
+  "33487": { city: "Boca Raton", county: "Palm Beach" },
+  "33496": { city: "Boca Raton", county: "Palm Beach" },
+  "33498": { city: "Boca Raton", county: "Palm Beach" },
+  "33037": { city: "Key Largo", county: "Monroe" },
+  "33036": { city: "Islamorada", county: "Monroe" },
+  "33050": { city: "Marathon", county: "Monroe" },
+  "33040": { city: "Key West", county: "Monroe" },
+  "34102": { city: "Naples", county: "Collier" },
+  "34103": { city: "Naples", county: "Collier" },
+  "34108": { city: "Naples", county: "Collier" },
+  "34109": { city: "Naples", county: "Collier" },
+  "34110": { city: "Naples", county: "Collier" },
+  "34113": { city: "Naples", county: "Collier" },
+  "34114": { city: "Naples", county: "Collier" },
+  "34119": { city: "Naples", county: "Collier" },
+  "34120": { city: "Naples", county: "Collier" },
+  "34134": { city: "Bonita Springs", county: "Lee" },
+  "33904": { city: "Cape Coral", county: "Lee" },
+  "33908": { city: "Fort Myers", county: "Lee" },
+  "33913": { city: "Fort Myers", county: "Lee" },
+  "33914": { city: "Cape Coral", county: "Lee" },
+  "33919": { city: "Fort Myers", county: "Lee" },
+  "33928": { city: "Estero", county: "Lee" },
+  "34952": { city: "Port St. Lucie", county: "St. Lucie" },
+  "34953": { city: "Port St. Lucie", county: "St. Lucie" },
+  "34957": { city: "Jensen Beach", county: "Martin" },
+  "34983": { city: "Port St. Lucie", county: "St. Lucie" },
+  "34986": { city: "Port St. Lucie", county: "St. Lucie" },
+  "34990": { city: "Palm City", county: "Martin" },
+  "34994": { city: "Stuart", county: "Martin" },
+  "34996": { city: "Stuart", county: "Martin" },
+  "34997": { city: "Stuart", county: "Martin" }
+};
+
 init();
 
 async function init() {
@@ -337,6 +513,16 @@ function getBotReply(prompt) {
     };
   }
 
+  if (lead.zip && lead.locationSource === "zip") {
+    const missing = nextMissingLeadField();
+    return {
+      message: missing
+        ? `I found ZIP ${lead.zip}: ${lead.location}, ${lead.county} County. What is your ${missing}?`
+        : `I found ZIP ${lead.zip}: ${lead.location}, ${lead.county} County. I have enough information and I am sending it to Misael now.`,
+      action: () => missing ? undefined : sendBotLeadSummary()
+    };
+  }
+
   if (looksLikeLead(prompt)) {
     updateBotLead(prompt);
     if (hasEnoughBotLead()) {
@@ -381,6 +567,17 @@ function updateBotLead(prompt) {
   const lead = state.botLead;
   lead.transcript = [...(lead.transcript || []), prompt].slice(-8);
 
+  const zip = prompt.match(/\b3\d{4}\b/);
+  if (zip) {
+    lead.zip = zip[0];
+    const match = zipLookup[zip[0]];
+    if (match) {
+      lead.location = match.city;
+      lead.county = match.county;
+      lead.locationSource = "zip";
+    }
+  }
+
   if (text.includes("buy") || text.includes("buyer") || text.includes("purchase")) lead.intent = "buyer";
   if (text.includes("sell") || text.includes("seller") || text.includes("list my")) lead.intent = "seller";
   if (text.includes("rent") || text.includes("rental") || text.includes("lease")) lead.intent = "renter";
@@ -400,7 +597,11 @@ function updateBotLead(prompt) {
 
   const locations = Object.values(citiesByCounty).flat();
   const location = locations.find((city) => text.includes(city.toLowerCase()));
-  if (location) lead.location = location;
+  if (location) {
+    lead.location = location;
+    lead.county = countyForCity(location);
+    lead.locationSource = "city";
+  }
 
   if (text.includes("condo")) lead.propertyType = "Condo";
   if (text.includes("townhouse") || text.includes("townhome")) lead.propertyType = "Townhouse";
@@ -440,6 +641,10 @@ function smartFollowUp(field) {
   return prompts[field] || "Tell me a little more so I can help.";
 }
 
+function countyForCity(city) {
+  return Object.entries(citiesByCounty).find(([, cities]) => cities.includes(city))?.[0] || "";
+}
+
 function hasEnoughBotLead() {
   const lead = state.botLead;
   return Boolean((lead.email || lead.phone) && (lead.intent || lead.location || lead.budget || lead.propertyType));
@@ -450,6 +655,8 @@ function sendBotLeadSummary() {
   const summary = [
     `Intent: ${lead.intent || ""}`,
     `Location: ${lead.location || ""}`,
+    `ZIP: ${lead.zip || ""}`,
+    `County: ${lead.county || ""}`,
     `Budget: ${lead.budget || ""}`,
     `Beds: ${lead.beds || ""}`,
     `Property Type: ${lead.propertyType || ""}`,
@@ -466,7 +673,9 @@ function sendBotLeadSummary() {
   saveBotLead(summary, {
     email: lead.email || "",
     phone: lead.phone || "",
-    property: lead.location || "",
+    property: [lead.location, lead.zip].filter(Boolean).join(" "),
+    zip: lead.zip || "",
+    county: lead.county || "",
     name: lead.name || ""
   });
   state.botLead = {};
@@ -566,6 +775,8 @@ async function submitLeadWithWeb3Forms(lead) {
         email: lead.email || "",
         phone: lead.phone || "",
         property: lead.property || "",
+        zip: lead.zip || "",
+        county: lead.county || "",
         message: lead.message || lead.notes || "",
         page: lead.page || window.location.href
       })
@@ -587,6 +798,8 @@ function openLeadEmailFallback(lead) {
     `Email: ${lead.email || ""}`,
     `Phone: ${lead.phone || ""}`,
     `Property: ${lead.property || ""}`,
+    `ZIP: ${lead.zip || ""}`,
+    `County: ${lead.county || ""}`,
     `Message: ${lead.message || lead.notes || ""}`,
     `Source: ${lead.source || ""}`,
     `Page: ${lead.page || window.location.href}`,
@@ -617,6 +830,8 @@ async function submitLeadWithFormSubmit(lead) {
       email: lead.email || "",
       phone: lead.phone || "",
       property: lead.property || "",
+      zip: lead.zip || "",
+      county: lead.county || "",
       message: lead.message || lead.notes || "",
       page: lead.page || window.location.href
     };
