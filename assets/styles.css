@@ -136,11 +136,13 @@ textarea {
   line-height: 0.98;
 }
 
-.login-panel input {
+.login-panel input,
+.login-panel select {
   transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
-.login-panel input:focus {
+.login-panel input:focus,
+.login-panel select:focus {
   transform: translateY(-1px);
 }
 
@@ -756,6 +758,50 @@ p {
   min-height: 20px;
   margin: 0;
   color: var(--green-dark);
+  font-weight: 800;
+}
+
+.registry-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.registry-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.registry-table-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(20, 108, 116, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 42px rgba(9, 51, 61, 0.12);
+}
+
+.registry-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.registry-table th,
+.registry-table td {
+  padding: 13px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(20, 108, 116, 0.12);
+  color: var(--green-dark);
+}
+
+.registry-table th {
+  background: rgba(218, 246, 245, 0.82);
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.registry-table a {
+  color: var(--teal);
   font-weight: 800;
 }
 

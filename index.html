@@ -11,31 +11,31 @@
     <form class="login-panel" id="loginForm">
       <span class="brand-mark">MDH</span>
       <div>
-        <span class="eyebrow">Client Registration</span>
+        <span class="eyebrow">Client Registration / Registro de Cliente</span>
         <h1>MYDreamHouse Peguero Real State.</h1>
       </div>
       <label>
-        <span>Client Name</span>
+        <span>Client Name / Nombre</span>
         <input required id="registrationName" name="name" autocomplete="name" placeholder="Full name">
       </label>
       <label>
-        <span>Phone Number</span>
+        <span>Phone Number / Telefono</span>
         <input required id="registrationPhone" name="phone" autocomplete="tel" inputmode="tel" placeholder="305-555-1212">
       </label>
       <label>
-        <span>Email</span>
+        <span>Email / Correo</span>
         <input required id="registrationEmail" name="email" type="email" autocomplete="email" placeholder="you@email.com">
       </label>
       <label>
-        <span>What are you looking to do?</span>
+        <span>What are you looking to do? / Que buscas?</span>
         <select required id="registrationIntent" name="intent">
-          <option value="">Choose one</option>
-          <option value="Buy">Buy</option>
-          <option value="Rent">Rent</option>
-          <option value="Sell">Sell</option>
+          <option value="">Choose one / Elige uno</option>
+          <option value="Buy">Buy / Comprar</option>
+          <option value="Rent">Rent / Rentar</option>
+          <option value="Sell">Sell / Vender</option>
         </select>
       </label>
-      <button class="primary-button" type="submit">Enter Website</button>
+      <button class="primary-button" type="submit">Enter Website / Entrar</button>
       <p id="loginStatus" class="form-status" role="status"></p>
     </form>
   </section>
@@ -49,6 +49,7 @@
       <button class="nav-button" data-view="featured">Featured</button>
       <button class="nav-button" data-view="favorites">Favorites <span id="favoriteCount">0</span></button>
       <button class="nav-button" data-view="alerts">Search Alerts</button>
+      <button class="nav-button" data-view="registry">Client Registry / Registro</button>
       <button class="nav-button" data-view="contact">Contact</button>
     </nav>
   </header>
@@ -165,6 +166,37 @@
         <button class="primary-button" type="submit">Save Lead</button>
         <p id="leadStatus" class="form-status" role="status"></p>
       </form>
+    </section>
+
+    <section class="contact-band hidden" id="registryView">
+      <div class="contact-copy">
+        <span class="eyebrow">Client Registry / Registro</span>
+        <h2>Registered Clients / Clientes Registrados</h2>
+        <p>Registration entries saved on this browser are listed here. Every registration is also sent by email for follow-up. Los registros guardados en este navegador aparecen aqui y tambien se envian por email.</p>
+      </div>
+      <div class="registry-panel">
+        <div class="registry-actions">
+          <button class="primary-button" id="exportRegistry" type="button">Export CSV / Exportar</button>
+        </div>
+        <div class="registry-table-wrap">
+          <table class="registry-table">
+            <thead>
+              <tr>
+                <th>Date / Fecha</th>
+                <th>Name / Nombre</th>
+                <th>Phone / Telefono</th>
+                <th>Email / Correo</th>
+                <th>Looking To / Busca</th>
+              </tr>
+            </thead>
+            <tbody id="registryBody">
+              <tr>
+                <td colspan="5">No registrations saved yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
     <section class="contact-band hidden" id="alertView">
@@ -320,8 +352,8 @@
     </article>
   </template>
 
-  <script src="assets/config.js?v=20260524-registrationintent"></script>
+  <script src="assets/config.js?v=20260524-registry"></script>
   <script src="assets/listings.js"></script>
-  <script src="assets/app.js?v=20260524-registrationintent"></script>
+  <script src="assets/app.js?v=20260524-registry"></script>
 </body>
 </html>
