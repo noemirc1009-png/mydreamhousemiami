@@ -469,7 +469,7 @@ function getBotReply(prompt) {
     const missing = nextMissingLeadField();
     return {
       message: missing
-        ? `Perfect. I can help schedule a showing. What is your ${missing}?`
+        ? `${leadSummarySentence()} Perfect, I can help schedule a showing. ${smartFollowUp(missing)}`
         : "Perfect. I have the showing details. I am sending this to Misael now.",
       action: () => missing ? switchView("contact") : sendBotLeadSummary()
     };
@@ -479,8 +479,8 @@ function getBotReply(prompt) {
     lead.intent = "search alert";
     return {
       message: lead.location
-        ? "Good. I opened Search Alerts so the search can be saved with city, price, beds, HOA, and frequency."
-        : "I opened Search Alerts. Start with the city or ZIP where you want listings.",
+        ? `${leadSummarySentence()} I opened Search Alerts so the search can be saved with city, price, beds, HOA, and frequency.`
+        : "I opened Search Alerts. Tell me the city or ZIP where you want listings, and I will help shape the search.",
       action: () => switchView("alerts")
     };
   }
@@ -517,7 +517,7 @@ function getBotReply(prompt) {
     const missing = nextMissingLeadField();
     return {
       message: missing
-        ? `I found ZIP ${lead.zip}: ${lead.location}, ${lead.county} County. What is your ${missing}?`
+        ? `I found ZIP ${lead.zip}: ${lead.location}, ${lead.county} County. ${smartFollowUp(missing)}`
         : `I found ZIP ${lead.zip}: ${lead.location}, ${lead.county} County. I have enough information and I am sending it to Misael now.`,
       action: () => missing ? undefined : sendBotLeadSummary()
     };
@@ -539,6 +539,12 @@ function getBotReply(prompt) {
   }
 
   if (hasEnoughBotLead()) {
+    const missing = nextImportantLeadField();
+    if (missing) {
+      return {
+        message: `${leadSummarySentence()} ${smartFollowUp(missing)}`
+      };
+    }
     sendBotLeadSummary();
     return {
       message: "I have enough information to help. I sent your request to Misael and opened the contact page in case you want to add more details.",
@@ -549,7 +555,7 @@ function getBotReply(prompt) {
   const missing = nextMissingLeadField();
   if (missing) {
     return {
-      message: smartFollowUp(missing)
+      message: `${acknowledgePrompt(prompt)} ${leadSummarySentence()} ${smartFollowUp(missing)}`
     };
   }
 
@@ -629,6 +635,14 @@ function nextMissingLeadField() {
   return "";
 }
 
+function nextImportantLeadField() {
+  const lead = state.botLead;
+  if (!lead.timeline) return "timeline";
+  if (!lead.budget && lead.intent !== "seller") return "budget";
+  if (!lead.beds && ["buyer", "renter", "search alert"].includes(lead.intent)) return "bedrooms";
+  return "";
+}
+
 function smartFollowUp(field) {
   const prompts = {
     goal: "Are you buying, selling, renting, or scheduling a showing?",
@@ -639,6 +653,29 @@ function smartFollowUp(field) {
     "email or phone": "What email or phone number should Misael use to contact you?"
   };
   return prompts[field] || "Tell me a little more so I can help.";
+}
+
+function acknowledgePrompt(prompt) {
+  const text = prompt.toLowerCase();
+  if (text.includes("thank")) return "You are welcome.";
+  if (text.includes("yes") || text.includes("ok")) return "Great.";
+  if (text.includes("no ")) return "No problem.";
+  if (/\b3\d{4}\b/.test(text)) return "Got it.";
+  return "Got it.";
+}
+
+function leadSummarySentence() {
+  const lead = state.botLead;
+  const parts = [];
+  if (lead.intent) parts.push(lead.intent);
+  if (lead.location) parts.push(lead.zip ? `${lead.location} ${lead.zip}` : lead.location);
+  if (lead.county) parts.push(`${lead.county} County`);
+  if (lead.budget) parts.push(lead.budget);
+  if (lead.beds) parts.push(lead.beds);
+  if (lead.propertyType) parts.push(lead.propertyType);
+  if (lead.hoa) parts.push(lead.hoa);
+  if (!parts.length) return "";
+  return `So far I have: ${parts.join(", ")}.`;
 }
 
 function countyForCity(city) {
