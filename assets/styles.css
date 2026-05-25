@@ -866,9 +866,12 @@ p {
 }
 
 .chatbot-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   pointer-events: auto;
   min-height: 54px;
-  padding: 0 20px;
+  padding: 6px 18px 6px 8px;
   color: var(--champagne-light);
   background:
     linear-gradient(135deg, rgba(8, 47, 58, 0.98), rgba(12, 111, 104, 0.95)),
@@ -885,6 +888,75 @@ p {
 .chatbot-toggle:hover {
   transform: translateY(-2px);
   box-shadow: 0 22px 44px rgba(8, 47, 58, 0.32);
+}
+
+.chatbot-home-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.92), transparent 28%),
+    linear-gradient(145deg, #dffbff, #fff2cf);
+  border: 1px solid rgba(255, 242, 207, 0.9);
+  box-shadow: inset 0 -4px 8px rgba(8, 47, 58, 0.12), 0 10px 20px rgba(8, 47, 58, 0.18);
+  animation: homeBuddyFloat 3.2s ease-in-out infinite;
+}
+
+.home-roof {
+  position: absolute;
+  top: 9px;
+  width: 25px;
+  height: 25px;
+  background: linear-gradient(135deg, #c86d58, #8f372b);
+  border-radius: 5px 5px 2px 2px;
+  transform: rotate(45deg);
+  box-shadow: 0 2px 0 rgba(255, 255, 255, 0.38) inset;
+}
+
+.home-body {
+  position: absolute;
+  bottom: 8px;
+  width: 27px;
+  height: 22px;
+  background: linear-gradient(180deg, #fffaf0, #ead9b8);
+  border: 2px solid #123f47;
+  border-radius: 6px;
+  box-shadow: 0 -2px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+.home-door {
+  position: absolute;
+  left: 5px;
+  bottom: 0;
+  width: 8px;
+  height: 13px;
+  background: linear-gradient(180deg, #0c6f68, #082f3a);
+  border-radius: 4px 4px 1px 1px;
+}
+
+.home-window {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 8px;
+  height: 8px;
+  background: #5fbcc5;
+  border: 1px solid #123f47;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.58) inset;
+}
+
+@keyframes homeBuddyFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(2deg);
+  }
 }
 
 .chatbot-panel {
