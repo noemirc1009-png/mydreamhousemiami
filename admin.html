@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyDreamHouse Admin</title>
+  <link rel="stylesheet" href="assets/styles.css">
+</head>
+<body class="admin-page">
+  <main class="admin-shell">
+    <section class="admin-login" id="adminLogin">
+      <span class="brand-mark">MDH</span>
+      <span class="eyebrow">Administrator / Administrador</span>
+      <h1>MyDreamHouse Admin</h1>
+      <p>Private area for client follow-up. Area privada para seguimiento de clientes.</p>
+      <form id="adminForm" class="lead-form">
+        <label>
+          <span>Username / Usuario</span>
+          <input id="adminUser" required autocomplete="username" placeholder="Username">
+        </label>
+        <label>
+          <span>Password / Contrasena</span>
+          <input id="adminPassword" required type="password" autocomplete="current-password" placeholder="Password">
+        </label>
+        <button class="primary-button" type="submit">Open Admin / Entrar</button>
+        <p id="adminStatus" class="form-status" role="status"></p>
+      </form>
+    </section>
+
+    <section class="admin-dashboard hidden" id="adminDashboard">
+      <div class="results-header">
+        <div>
+          <span class="eyebrow">Lead Inbox / Registro</span>
+          <h2>Client Follow-Up</h2>
+        </div>
+        <a class="secondary-button" href="./">Client Website</a>
+      </div>
+
+      <div class="admin-note">
+        <strong>Important / Importante</strong>
+        <p>The client website sends each registration to your email through Web3Forms. Because GitHub Pages is static, this admin page cannot automatically read every visitor's private browser storage. For a real live admin inbox here, connect a backend database or a form service API.</p>
+        <p>La pagina envia cada registro a tu email por Web3Forms. Como GitHub Pages es estatico, esta pagina admin no puede leer automaticamente el navegador privado de cada visitante. Para un inbox real aqui, se necesita una base de datos/backend o API del servicio de formularios.</p>
+      </div>
+
+      <div class="registry-panel">
+        <div class="registry-actions">
+          <button class="primary-button" id="exportAdminRegistry" type="button">Export Local CSV / Exportar Local</button>
+        </div>
+        <div class="registry-table-wrap">
+          <table class="registry-table">
+            <thead>
+              <tr>
+                <th>Date / Fecha</th>
+                <th>Name / Nombre</th>
+                <th>Phone / Telefono</th>
+                <th>Email / Correo</th>
+                <th>Looking To / Busca</th>
+              </tr>
+            </thead>
+            <tbody id="adminRegistryBody">
+              <tr>
+                <td colspan="5">Local admin registry is empty. Check Web3Forms/email for live client submissions.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/admin.js?v=20260525-adminsplit"></script>
+</body>
+</html>

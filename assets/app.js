@@ -44,8 +44,6 @@ const elements = {
   leadStatus: document.querySelector("#leadStatus"),
   alertForm: document.querySelector("#alertForm"),
   alertStatus: document.querySelector("#alertStatus"),
-  registryBody: document.querySelector("#registryBody"),
-  exportRegistry: document.querySelector("#exportRegistry"),
   newListingPop: document.querySelector("#newListingPop"),
   newListingClose: document.querySelector("#newListingClose"),
   newListingImage: document.querySelector("#newListingImage"),
@@ -345,10 +343,6 @@ function bindEvents() {
   }
 
   elements.sortInput.addEventListener("change", applyFilters);
-
-  if (elements.exportRegistry) {
-    elements.exportRegistry.addEventListener("click", exportClientRegistry);
-  }
 
   document.querySelectorAll("[data-view]").forEach((button) => {
     button.addEventListener("click", () => switchView(button.dataset.view));
@@ -1233,81 +1227,11 @@ function bindLogin() {
     };
 
     localStorage.setItem("mdhClientRegistration", JSON.stringify(registrationLead));
-    saveClientRegistration(registrationLead);
     sessionStorage.setItem("mdhRegistered", "true");
     elements.loginGate.classList.add("hidden");
     elements.loginForm.reset();
-    renderClientRegistry();
     submitLead(registrationLead);
   });
-}
-
-function getClientRegistry() {
-  return JSON.parse(localStorage.getItem("mdhClientRegistry") || "[]");
-}
-
-function saveClientRegistration(registrationLead) {
-  const registry = getClientRegistry();
-  registry.unshift(registrationLead);
-  localStorage.setItem("mdhClientRegistry", JSON.stringify(registry.slice(0, 250)));
-}
-
-function renderClientRegistry() {
-  if (!elements.registryBody) return;
-  const registry = getClientRegistry();
-  if (!registry.length) {
-    elements.registryBody.innerHTML = `<tr><td colspan="5">No registrations saved yet. / Todavia no hay registros.</td></tr>`;
-    return;
-  }
-
-  elements.registryBody.innerHTML = registry.map((client) => `
-    <tr>
-      <td>${escapeHtml(formatRegistryDate(client.createdAt))}</td>
-      <td>${escapeHtml(client.name || "")}</td>
-      <td><a href="tel:${escapeHtml(client.phone || "")}">${escapeHtml(client.phone || "")}</a></td>
-      <td><a href="mailto:${escapeHtml(client.email || "")}">${escapeHtml(client.email || "")}</a></td>
-      <td>${escapeHtml(client.intent || "")}</td>
-    </tr>
-  `).join("");
-}
-
-function exportClientRegistry() {
-  const registry = getClientRegistry();
-  if (!registry.length) return;
-
-  const headers = ["Date", "Name", "Phone", "Email", "Looking To"];
-  const rows = registry.map((client) => [
-    formatRegistryDate(client.createdAt),
-    client.name || "",
-    client.phone || "",
-    client.email || "",
-    client.intent || ""
-  ]);
-  const csv = [headers, ...rows]
-    .map((row) => row.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(","))
-    .join("\n");
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `mydreamhouse-client-registry-${new Date().toISOString().slice(0, 10)}.csv`;
-  link.click();
-  URL.revokeObjectURL(url);
-}
-
-function formatRegistryDate(value) {
-  if (!value) return "";
-  return new Date(value).toLocaleString();
-}
-
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (character) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    "\"": "&quot;",
-    "'": "&#39;"
-  }[character]));
 }
 
 function startBeachSound() {
@@ -1547,7 +1471,6 @@ function render() {
   elements.favoriteCount.textContent = state.favorites.size;
   elements.resultCount.textContent = state.filtered.length;
   elements.medianPrice.textContent = calculateMedian(state.filtered);
-  renderClientRegistry();
 }
 
 function renderListings(container, listings, favoritesOnly = false) {
@@ -1610,9 +1533,7 @@ function switchView(view) {
   document.querySelector("#featuredView").classList.toggle("hidden", view !== "featured");
   document.querySelector("#favoritesView").classList.toggle("hidden", view !== "favorites");
   document.querySelector("#alertView").classList.toggle("hidden", view !== "alerts");
-  document.querySelector("#registryView").classList.toggle("hidden", view !== "registry");
   document.querySelector("#contactView").classList.toggle("hidden", view !== "contact");
-  if (view === "registry") renderClientRegistry();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
