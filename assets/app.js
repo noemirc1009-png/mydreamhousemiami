@@ -459,6 +459,21 @@ function getBotReply(prompt) {
   const lead = state.botLead;
   const promptHasZip = /\b3\d{4}\b/.test(prompt);
 
+  if (lead.lastQuestion === "timeline") {
+    const timeline = detectLooseTimeline(text);
+    if (timeline) {
+      lead.timeline = timeline;
+      const missing = nextMissingLeadField();
+      return {
+        message: missing
+          ? `${leadSummarySentence()} ${smartFollowUp(missing)}`
+          : "Perfect. I have enough information and I am sending it to Misael now.",
+        nextQuestion: missing,
+        action: () => missing ? undefined : sendBotLeadSummary()
+      };
+    }
+  }
+
   if (text.includes("reset") || text.includes("start over")) {
     state.botLead = {};
     return {
@@ -706,7 +721,7 @@ function smartFollowUp(field) {
     "city or ZIP": "Which city or ZIP do you prefer? For example Miami, Doral, Brickell, Aventura, or Coral Gables.",
     budget: "What budget or price range should I use? Example: 600k to 900k.",
     bedrooms: "How many bedrooms do you need?",
-    timeline: "When would you like to move or see homes: this week, this month, or later?",
+    timeline: "When would you like to move or see homes: this week, next week, this month, or later?",
     "email or phone": "What email or phone number should Misael use to contact you?"
   };
   return prompts[field] || "Tell me a little more so I can help.";
