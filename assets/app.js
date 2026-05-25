@@ -432,6 +432,7 @@ function handleBotPrompt(rawPrompt) {
 
   window.setTimeout(() => {
     const reply = getBotReply(prompt);
+    state.botLead.lastQuestion = reply.nextQuestion || "";
     addBotMessage(reply.message);
     if (reply.action) reply.action();
   }, 260);
@@ -456,6 +457,7 @@ function addChatMessage(message, type) {
 function getBotReply(prompt) {
   const text = prompt.toLowerCase();
   const lead = state.botLead;
+  const promptHasZip = /\b3\d{4}\b/.test(prompt);
 
   if (text.includes("reset") || text.includes("start over")) {
     state.botLead = {};
@@ -471,6 +473,7 @@ function getBotReply(prompt) {
       message: missing
         ? `${leadSummarySentence()} Perfect, I can help schedule a showing. ${smartFollowUp(missing)}`
         : "Perfect. I have the showing details. I am sending this to Misael now.",
+      nextQuestion: missing,
       action: () => missing ? switchView("contact") : sendBotLeadSummary()
     };
   }
@@ -481,6 +484,7 @@ function getBotReply(prompt) {
       message: lead.location
         ? `${leadSummarySentence()} I opened Search Alerts so the search can be saved with city, price, beds, HOA, and frequency.`
         : "I opened Search Alerts. Tell me the city or ZIP where you want listings, and I will help shape the search.",
+      nextQuestion: lead.location ? "" : "city or ZIP",
       action: () => switchView("alerts")
     };
   }
@@ -513,12 +517,13 @@ function getBotReply(prompt) {
     };
   }
 
-  if (lead.zip && lead.locationSource === "zip") {
+  if (promptHasZip && lead.zip && lead.locationSource === "zip") {
     const missing = nextMissingLeadField();
     return {
       message: missing
         ? `I found ZIP ${lead.zip}: ${lead.location}, ${lead.county} County. ${smartFollowUp(missing)}`
         : `I found ZIP ${lead.zip}: ${lead.location}, ${lead.county} County. I have enough information and I am sending it to Misael now.`,
+      nextQuestion: missing,
       action: () => missing ? undefined : sendBotLeadSummary()
     };
   }
@@ -542,7 +547,8 @@ function getBotReply(prompt) {
     const missing = nextImportantLeadField();
     if (missing) {
       return {
-        message: `${leadSummarySentence()} ${smartFollowUp(missing)}`
+        message: `${leadSummarySentence()} ${smartFollowUp(missing)}`,
+        nextQuestion: missing
       };
     }
     sendBotLeadSummary();
@@ -555,7 +561,8 @@ function getBotReply(prompt) {
   const missing = nextMissingLeadField();
   if (missing) {
     return {
-      message: `${acknowledgePrompt(prompt)} ${leadSummarySentence()} ${smartFollowUp(missing)}`
+      message: `${acknowledgePrompt(prompt)} ${leadSummarySentence()} ${smartFollowUp(missing)}`,
+      nextQuestion: missing
     };
   }
 
@@ -572,6 +579,18 @@ function updateBotLead(prompt) {
   const text = prompt.toLowerCase();
   const lead = state.botLead;
   lead.transcript = [...(lead.transcript || []), prompt].slice(-8);
+
+  const shortNumber = prompt.match(/^\s*([1-9])\s*$/);
+  if (shortNumber) {
+    if (lead.lastQuestion === "bedrooms" || (!lead.beds && lead.location)) {
+      lead.beds = `${shortNumber[1]}+ beds`;
+      return;
+    }
+    if (lead.lastQuestion === "budget" && Number(shortNumber[1]) >= 1) {
+      lead.budget = `${shortNumber[1]}00k`;
+      return;
+    }
+  }
 
   const zip = prompt.match(/\b3\d{4}\b/);
   if (zip) {
