@@ -455,7 +455,7 @@ function addChatMessage(message, type) {
 }
 
 function getBotReply(prompt) {
-  const text = prompt.toLowerCase();
+  const text = normalizeBotText(prompt);
   const lead = state.botLead;
   const promptHasZip = /\b3\d{4}\b/.test(prompt);
 
@@ -577,6 +577,7 @@ function looksLikeLead(text) {
 
 function updateBotLead(prompt) {
   const text = prompt.toLowerCase();
+  const normalized = normalizeBotText(prompt);
   const lead = state.botLead;
   lead.transcript = [...(lead.transcript || []), prompt].slice(-8);
 
@@ -588,6 +589,14 @@ function updateBotLead(prompt) {
     }
     if (lead.lastQuestion === "budget" && Number(shortNumber[1]) >= 1) {
       lead.budget = `${shortNumber[1]}00k`;
+      return;
+    }
+  }
+
+  if (lead.lastQuestion === "timeline") {
+    const looseTimeline = detectLooseTimeline(normalized);
+    if (looseTimeline) {
+      lead.timeline = looseTimeline;
       return;
     }
   }
@@ -614,33 +623,59 @@ function updateBotLead(prompt) {
   const phone = prompt.match(/\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/);
   if (phone) lead.phone = phone[0];
 
-  const beds = text.match(/\b([1-9])\s*(?:bed|beds|bedroom|bedrooms|br)\b/);
+  const beds = normalized.match(/\b([1-9])\s*(?:bed|beds|bedroom|bedrooms|br)\b/);
   if (beds) lead.beds = `${beds[1]}+ beds`;
 
   const budget = prompt.match(/\$?\s?\d{3,}(?:,\d{3})*(?:\s?(?:k|m|million))?(?:\s?(?:-|to)\s?\$?\s?\d{3,}(?:,\d{3})*(?:\s?(?:k|m|million))?)?/i);
   if (budget && /price|budget|\$|k|million|m\b|to|-/.test(text)) lead.budget = budget[0].trim();
 
   const locations = Object.values(citiesByCounty).flat();
-  const location = locations.find((city) => text.includes(city.toLowerCase()));
+  const location = locations.find((city) => normalized.includes(city.toLowerCase()));
   if (location) {
     lead.location = location;
     lead.county = countyForCity(location);
     lead.locationSource = "city";
   }
 
-  if (text.includes("condo")) lead.propertyType = "Condo";
-  if (text.includes("townhouse") || text.includes("townhome")) lead.propertyType = "Townhouse";
-  if (text.includes("single family") || text.includes("house")) lead.propertyType = "Single Family";
-  if (text.includes("waterfront") || text.includes("water front")) lead.amenities = "Waterfront";
-  if (text.includes("pool")) lead.amenities = [lead.amenities, "Pool"].filter(Boolean).join(", ");
-  if (text.includes("no hoa")) lead.hoa = "No HOA";
-  if (text.includes("hoa under")) lead.hoa = prompt.match(/hoa under\s?\$?\d+/i)?.[0] || "HOA limit requested";
-  if (text.includes("cash")) lead.financing = "Cash";
-  if (text.includes("pre approved") || text.includes("pre-approved") || text.includes("preapproval")) lead.financing = "Pre-approved";
+  if (normalized.includes("condo")) lead.propertyType = "Condo";
+  if (normalized.includes("townhouse") || normalized.includes("townhome")) lead.propertyType = "Townhouse";
+  if (normalized.includes("single family") || normalized.includes("house")) lead.propertyType = "Single Family";
+  if (normalized.includes("waterfront") || normalized.includes("water front")) lead.amenities = "Waterfront";
+  if (normalized.includes("pool")) lead.amenities = [lead.amenities, "Pool"].filter(Boolean).join(", ");
+  if (normalized.includes("no hoa")) lead.hoa = "No HOA";
+  if (normalized.includes("hoa under")) lead.hoa = prompt.match(/hoa under\s?\$?\d+/i)?.[0] || "HOA limit requested";
+  if (normalized.includes("cash")) lead.financing = "Cash";
+  if (normalized.includes("pre approved") || normalized.includes("pre-approved") || normalized.includes("preapproval")) lead.financing = "Pre-approved";
 
-  const timelineWords = ["today", "tomorrow", "this week", "weekend", "month", "soon", "asap", "30 days", "60 days", "90 days"];
-  const timeline = timelineWords.find((word) => text.includes(word));
+  const timelineWords = ["today", "tomorrow", "this week", "this month", "weekend", "month", "soon", "asap", "30 days", "60 days", "90 days", "later"];
+  const timeline = timelineWords.find((word) => normalized.includes(word));
   if (timeline) lead.timeline = timeline;
+}
+
+function detectLooseTimeline(text) {
+  if (text.includes("this") && text.includes("month")) return "this month";
+  if (text.includes("this") && text.includes("week")) return "this week";
+  if (text.includes("weekend")) return "weekend";
+  if (text.includes("soon") || text.includes("asap")) return "soon";
+  if (text.includes("later")) return "later";
+  if (/\b30\b/.test(text)) return "30 days";
+  if (/\b60\b/.test(text)) return "60 days";
+  if (/\b90\b/.test(text)) return "90 days";
+  if (text.length <= 16 && text.includes("month")) return "this month";
+  return "";
+}
+
+function normalizeBotText(value) {
+  return String(value)
+    .toLowerCase()
+    .replace(/\bmont\b|\bmonht\b|\bmoth\b|\bmnth\b/g, "month")
+    .replace(/\bths\b|\bdis\b/g, "this")
+    .replace(/\btomorow\b|\btommorow\b/g, "tomorrow")
+    .replace(/\bweak\b/g, "week")
+    .replace(/\bbedroms\b|\bbedrom\b|\bbdr\b/g, "bedrooms")
+    .replace(/\bbugdet\b|\bbudjet\b/g, "budget")
+    .replace(/\bmiame\b/g, "miami")
+    .replace(/\bdorla\b/g, "doral");
 }
 
 function nextMissingLeadField() {
@@ -675,7 +710,7 @@ function smartFollowUp(field) {
 }
 
 function acknowledgePrompt(prompt) {
-  const text = prompt.toLowerCase();
+  const text = normalizeBotText(prompt);
   if (text.includes("thank")) return "You are welcome.";
   if (text.includes("yes") || text.includes("ok")) return "Great.";
   if (text.includes("no ")) return "No problem.";
