@@ -18,6 +18,7 @@ const elements = {
   registrationName: document.querySelector("#registrationName"),
   registrationPhone: document.querySelector("#registrationPhone"),
   registrationEmail: document.querySelector("#registrationEmail"),
+  registrationIntent: document.querySelector("#registrationIntent"),
   loginStatus: document.querySelector("#loginStatus"),
   idxFrame: document.querySelector("#idxFrame"),
   searchForm: document.querySelector("#searchForm"),
@@ -1198,9 +1199,10 @@ function bindLogin() {
     const name = elements.registrationName.value.trim();
     const phone = elements.registrationPhone.value.trim();
     const email = elements.registrationEmail.value.trim();
+    const intent = elements.registrationIntent.value;
 
-    if (!name || !phone || !email) {
-      elements.loginStatus.textContent = "Please complete name, phone, and email.";
+    if (!name || !phone || !email || !intent) {
+      elements.loginStatus.textContent = "Please complete name, phone, email, and Buy/Rent/Sell.";
       return;
     }
 
@@ -1209,14 +1211,16 @@ function bindLogin() {
       name,
       phone,
       email,
+      intent,
       source: "registration gate",
-      property: "Website registration",
+      property: `Website registration - ${intent}`,
       message: [
         "New MyDreamHouse website registration",
         "",
         `Name: ${name}`,
         `Phone: ${phone}`,
-        `Email: ${email}`
+        `Email: ${email}`,
+        `Looking To: ${intent}`
       ].join("\n"),
       page: window.location.href,
       createdAt: new Date().toISOString()
