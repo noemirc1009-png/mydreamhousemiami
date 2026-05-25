@@ -475,6 +475,10 @@ function getBotReply(prompt) {
     }
   }
 
+  if (lead.lastQuestion === "name" && !lead.name) {
+    lead.name = cleanLeadName(prompt);
+  }
+
   if (text.includes("reset") || text.includes("start over")) {
     state.botLead = {};
     return {
@@ -553,8 +557,10 @@ function getBotReply(prompt) {
         action: () => switchView("contact")
       };
     }
+    const missing = nextMissingLeadField();
     return {
-      message: botLine("contactSaved"),
+      message: `${botLine("contactSaved")} ${smartFollowUp(missing)}`,
+      nextQuestion: missing,
       action: () => switchView("contact")
     };
   }
@@ -638,6 +644,9 @@ function updateBotLead(prompt) {
 
   const phone = prompt.match(/\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/);
   if (phone) lead.phone = phone[0];
+
+  const name = extractLeadName(prompt);
+  if (name) lead.name = name;
 
   const beds = normalized.match(/\b([1-9])\s*(?:bed|beds|bedroom|bedrooms|br)\b/);
   if (beds) lead.beds = `${beds[1]}+ beds`;
@@ -744,7 +753,7 @@ function botLine(key, values = {}) {
       budgetAsk: "What price range are you comfortable with? Example: 500k to 800k.",
       zipFound: `I found ZIP ${values.zip}: ${values.location}, ${values.county} County.`,
       sent: "Thank you. I sent your information to Misael. He can follow up with the best next step.",
-      contactSaved: "Thank you. I have your contact. What city, budget, and type of home are you looking for?",
+      contactSaved: "Thank you. I saved that detail.",
       sentWithContact: "I have enough information to help. I sent your request to Misael and opened the contact page in case you want to add more details.",
       fallback: "I can help with buying, selling, renting, MLS search, HOA, and saved alerts. Tell me your city, budget, bedrooms, and when you want to move."
     },
@@ -762,7 +771,7 @@ function botLine(key, values = {}) {
       budgetAsk: "Que rango de precio prefieres? Ejemplo: 500k a 800k.",
       zipFound: `Encontre el ZIP ${values.zip}: ${values.location}, condado de ${values.county}.`,
       sent: "Gracias. Envie tu informacion a Misael para que te contacte con el mejor proximo paso.",
-      contactSaved: "Gracias. Ya tengo tu contacto. Que ciudad, presupuesto y tipo de propiedad estas buscando?",
+      contactSaved: "Gracias. Guarde ese detalle.",
       sentWithContact: "Ya tengo suficiente informacion. Envie tu solicitud a Misael y abri la pagina de contacto por si quieres agregar mas detalles.",
       fallback: "Puedo ayudarte a comprar, vender, rentar, buscar en el MLS, HOA y alertas guardadas. Dime ciudad, presupuesto, habitaciones y cuando quieres moverte."
     }
@@ -782,6 +791,7 @@ function normalizeBotText(value) {
     .replace(/\bhabitacion\b|\bhabitaciones\b|\bcuarto\b|\bcuartos\b|\bdormitorio\b|\bdormitorios\b|\brecamara\b|\brecamaras\b/g, "bedrooms")
     .replace(/\bbano\b|\bbanos\b/g, "baths")
     .replace(/\bcorreo\b/g, "email")
+    .replace(/\bnombre\b/g, "name")
     .replace(/\btelefono\b|\bcelular\b/g, "phone")
     .replace(/\bcita\b|\bmostrar\b|\bver\b|\bvisitar\b/g, "showing")
     .replace(/\bbuscar\b|\bbusqueda\b/g, "search")
@@ -834,7 +844,9 @@ function nextMissingLeadField() {
   if (!lead.budget && lead.intent !== "seller") return "budget";
   if (!lead.beds && ["buyer", "renter", "search alert"].includes(lead.intent)) return "bedrooms";
   if (!lead.timeline) return "timeline";
-  if (!lead.email && !lead.phone) return "email or phone";
+  if (!lead.name) return "name";
+  if (!lead.email) return "email";
+  if (!lead.phone) return "phone";
   return "";
 }
 
@@ -854,7 +866,9 @@ function smartFollowUp(field) {
       budget: "What budget or price range should I use? Example: 600k to 900k.",
       bedrooms: "How many bedrooms do you need?",
       timeline: "When would you like to move or see homes: this week, next week, this month, next month, or a specific day?",
-      "email or phone": "What email or phone number should Misael use to contact you?"
+      name: "What is your full name?",
+      email: "What email should Misael use to contact you?",
+      phone: "What phone number should Misael use to contact you?"
     },
     es: {
       goal: "Quieres comprar, vender o rentar?",
@@ -862,7 +876,9 @@ function smartFollowUp(field) {
       budget: "Que presupuesto o rango de precio quieres usar? Ejemplo: 600k a 900k.",
       bedrooms: "Cuantas habitaciones necesitas?",
       timeline: "Cuando quieres mudarte o ver propiedades: esta semana, proxima semana, este mes, proximo mes o un dia especifico?",
-      "email or phone": "Que email o telefono debe usar Misael para contactarte?"
+      name: "Cual es tu nombre completo?",
+      email: "Que email debe usar Misael para contactarte?",
+      phone: "Que numero de telefono debe usar Misael para contactarte?"
     }
   };
   return prompts[botLanguage()][field] || prompts.en[field] || (botLanguage() === "es" ? "Dime un poco mas para ayudarte." : "Tell me a little more so I can help.");
@@ -894,6 +910,7 @@ function leadSummarySentence() {
   if (lead.beds) parts.push(lead.beds);
   if (lead.propertyType) parts.push(lead.propertyType);
   if (lead.hoa) parts.push(lead.hoa);
+  if (lead.name) parts.push(lead.name);
   if (!parts.length) return "";
   return botLanguage() === "es" ? `Hasta ahora tengo: ${parts.join(", ")}.` : `So far I have: ${parts.join(", ")}.`;
 }
@@ -910,18 +927,39 @@ function localizeIntent(intent) {
   return labels[intent] || intent;
 }
 
+function extractLeadName(prompt) {
+  const normalized = stripAccents(String(prompt).trim());
+  const match = normalized.match(/\b(?:my name is|name is|i am|i'm|soy|me llamo|mi nombre es)\s+([a-zA-Z][a-zA-Z\s.'-]{1,50})/i);
+  if (!match) return "";
+  return cleanLeadName(match[1]);
+}
+
+function cleanLeadName(value) {
+  return String(value)
+    .replace(/\b(?:email|phone|telefono|correo|number|numero|is|es)\b.*$/i, "")
+    .replace(/[^\w\s.'-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 4)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
 function countyForCity(city) {
   return Object.entries(citiesByCounty).find(([, cities]) => cities.includes(city))?.[0] || "";
 }
 
 function hasEnoughBotLead() {
   const lead = state.botLead;
-  return Boolean((lead.email || lead.phone) && (lead.intent || lead.location || lead.budget || lead.propertyType));
+  return Boolean(lead.name && lead.email && lead.phone && (lead.intent || lead.location || lead.budget || lead.propertyType));
 }
 
 function sendBotLeadSummary() {
   const lead = state.botLead;
   const summary = [
+    `Name: ${lead.name || ""}`,
     `Intent: ${lead.intent || ""}`,
     `Location: ${lead.location || ""}`,
     `ZIP: ${lead.zip || ""}`,
