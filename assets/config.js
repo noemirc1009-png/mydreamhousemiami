@@ -4,5 +4,5 @@ window.MLS_CONFIG = {
   apiBaseUrl: "https://mydreamhousemiami.onrender.com",
   endpoint: "/api/listings",
   apiKey: "",
-  web3FormsAccessKey: ""
+  web3FormsAccessKey: "525ff02c-ecf3-48db-ad06-39b037a47c23"
 };
