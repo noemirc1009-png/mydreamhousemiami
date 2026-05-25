@@ -411,7 +411,7 @@ function bindChatbot() {
     button.addEventListener("click", () => handleBotPrompt(button.dataset.botPrompt));
   });
 
-  addBotMessage("Hi, I am the MyDreamHouse assistant. Are you buying, selling, renting, or looking for a showing?");
+  addBotMessage("Hi, I am the MyDreamHouse assistant. Hola, soy el asistente de MyDreamHouse. Are you buying, selling, or renting? Quieres comprar, vender o rentar?");
 }
 
 function toggleChatbot(open) {
@@ -428,6 +428,7 @@ function handleBotPrompt(rawPrompt) {
 
   addUserMessage(prompt);
   elements.chatbotInput.value = "";
+  updateBotLanguage(prompt);
   updateBotLead(prompt);
 
   window.setTimeout(() => {
@@ -467,7 +468,7 @@ function getBotReply(prompt) {
       return {
         message: missing
           ? `${leadSummarySentence()} ${smartFollowUp(missing)}`
-          : "Perfect. I have enough information and I am sending it to Misael now.",
+          : botLine("readyToSend"),
         nextQuestion: missing,
         action: () => missing ? undefined : sendBotLeadSummary()
       };
@@ -477,7 +478,7 @@ function getBotReply(prompt) {
   if (text.includes("reset") || text.includes("start over")) {
     state.botLead = {};
     return {
-      message: "No problem. Let us start fresh. Are you buying, selling, renting, or looking for a showing?"
+      message: botLine("reset")
     };
   }
 
@@ -486,8 +487,8 @@ function getBotReply(prompt) {
     const missing = nextMissingLeadField();
     return {
       message: missing
-        ? `${leadSummarySentence()} Perfect, I can help schedule a showing. ${smartFollowUp(missing)}`
-        : "Perfect. I have the showing details. I am sending this to Misael now.",
+        ? `${leadSummarySentence()} ${botLine("showingHelp")} ${smartFollowUp(missing)}`
+        : botLine("showingReady"),
       nextQuestion: missing,
       action: () => missing ? switchView("contact") : sendBotLeadSummary()
     };
@@ -497,8 +498,8 @@ function getBotReply(prompt) {
     lead.intent = "search alert";
     return {
       message: lead.location
-        ? `${leadSummarySentence()} I opened Search Alerts so the search can be saved with city, price, beds, HOA, and frequency.`
-        : "I opened Search Alerts. Tell me the city or ZIP where you want listings, and I will help shape the search.",
+        ? `${leadSummarySentence()} ${botLine("alertsOpenedReady")}`
+        : botLine("alertsOpened"),
       nextQuestion: lead.location ? "" : "city or ZIP",
       action: () => switchView("alerts")
     };
@@ -506,29 +507,29 @@ function getBotReply(prompt) {
 
   if (text.includes("search") || text.includes("mls") || text.includes("idx") || text.includes("map")) {
     return {
-      message: "The live Matrix IDX search is on Map + List. Use the MLS tools there for the most accurate live results from your IDX feed.",
+      message: botLine("idxSearch"),
       action: () => switchView("idx")
     };
   }
 
   if (text.includes("favorite") || text.includes("save")) {
     return {
-      message: "I opened Favorites. Visitors can save homes from the Featured listings and come back to them on this device.",
+      message: botLine("favorites"),
       action: () => switchView("favorites")
     };
   }
 
   if (text.includes("hoa")) {
     return {
-      message: "For HOA, I can track No HOA or a maximum monthly HOA. Tell me something like: no HOA, HOA under 500, or any HOA."
+      message: botLine("hoa")
     };
   }
 
   if (text.includes("price") || text.includes("budget") || text.includes("pre approval") || text.includes("preapproval")) {
     return {
       message: lead.budget
-        ? `I have your budget as ${lead.budget}. Do you already have a pre-approval, or do you need help getting ready?`
-        : "What price range are you comfortable with? Example: 500k to 800k."
+        ? botLine("budgetKnown", { budget: lead.budget })
+        : botLine("budgetAsk")
     };
   }
 
@@ -536,8 +537,8 @@ function getBotReply(prompt) {
     const missing = nextMissingLeadField();
     return {
       message: missing
-        ? `I found ZIP ${lead.zip}: ${lead.location}, ${lead.county} County. ${smartFollowUp(missing)}`
-        : `I found ZIP ${lead.zip}: ${lead.location}, ${lead.county} County. I have enough information and I am sending it to Misael now.`,
+        ? `${botLine("zipFound", { zip: lead.zip, location: lead.location, county: lead.county })} ${smartFollowUp(missing)}`
+        : `${botLine("zipFound", { zip: lead.zip, location: lead.location, county: lead.county })} ${botLine("readyToSend")}`,
       nextQuestion: missing,
       action: () => missing ? undefined : sendBotLeadSummary()
     };
@@ -548,12 +549,12 @@ function getBotReply(prompt) {
     if (hasEnoughBotLead()) {
       sendBotLeadSummary();
       return {
-        message: "Thank you. I sent your information to Misael. He can follow up with the best next step.",
+        message: botLine("sent"),
         action: () => switchView("contact")
       };
     }
     return {
-      message: `Thank you. I have your contact. What city, budget, and type of home are you looking for?`,
+      message: botLine("contactSaved"),
       action: () => switchView("contact")
     };
   }
@@ -568,7 +569,7 @@ function getBotReply(prompt) {
     }
     sendBotLeadSummary();
     return {
-      message: "I have enough information to help. I sent your request to Misael and opened the contact page in case you want to add more details.",
+      message: botLine("sentWithContact"),
       action: () => switchView("contact")
     };
   }
@@ -582,7 +583,7 @@ function getBotReply(prompt) {
   }
 
   return {
-    message: "I can help with buying, selling, renting, showings, MLS search, HOA, and saved alerts. Tell me your city, budget, bedrooms, and when you want to move."
+    message: botLine("fallback")
   };
 }
 
@@ -627,10 +628,10 @@ function updateBotLead(prompt) {
     }
   }
 
-  if (text.includes("buy") || text.includes("buyer") || text.includes("purchase")) lead.intent = "buyer";
-  if (text.includes("sell") || text.includes("seller") || text.includes("list my")) lead.intent = "seller";
-  if (text.includes("rent") || text.includes("rental") || text.includes("lease")) lead.intent = "renter";
-  if (text.includes("showing") || text.includes("tour") || text.includes("visit")) lead.intent = "showing";
+  if (normalized.includes("buy") || normalized.includes("buyer") || normalized.includes("purchase")) lead.intent = "buyer";
+  if (normalized.includes("sell") || normalized.includes("seller") || normalized.includes("list my")) lead.intent = "seller";
+  if (normalized.includes("rent") || normalized.includes("rental") || normalized.includes("lease")) lead.intent = "renter";
+  if (normalized.includes("showing") || normalized.includes("tour") || normalized.includes("visit")) lead.intent = "showing";
 
   const email = prompt.match(/\b[\w.%+-]+@[\w.-]+\.[a-z]{2,}\b/i);
   if (email) lead.email = email[0];
@@ -701,9 +702,116 @@ function titleCase(value) {
   return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
 }
 
+function updateBotLanguage(prompt) {
+  if (detectSpanish(prompt)) {
+    state.botLanguage = "es";
+  } else if (detectEnglish(prompt)) {
+    state.botLanguage = "en";
+  }
+}
+
+function botLanguage() {
+  return state.botLanguage === "es" ? "es" : "en";
+}
+
+function detectSpanish(value) {
+  const text = stripAccents(String(value).toLowerCase());
+  return /\b(hola|quiero|comprar|vender|rentar|alquilar|casa|condominio|apartamento|presupuesto|precio|habitacion|habitaciones|cuarto|cuartos|dormitorio|dormitorios|bano|banos|semana|mes|proxima|proximo|manana|hoy|viernes|sabado|domingo|lunes|martes|miercoles|jueves|correo|telefono|gracias)\b/.test(text);
+}
+
+function detectEnglish(value) {
+  const text = String(value).toLowerCase();
+  return /\b(hello|hi|buy|sell|rent|home|house|budget|price|bed|beds|bedroom|week|month|today|tomorrow|email|phone|thanks)\b/.test(text);
+}
+
+function stripAccents(value) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function botLine(key, values = {}) {
+  const lines = {
+    en: {
+      reset: "No problem. Let us start fresh. Are you buying, selling, or renting?",
+      readyToSend: "Perfect. I have enough information and I am sending it to Misael now.",
+      showingHelp: "Perfect, I can help schedule a showing.",
+      showingReady: "Perfect. I have the showing details. I am sending this to Misael now.",
+      alertsOpenedReady: "I opened Search Alerts so the search can be saved with city, price, beds, HOA, and frequency.",
+      alertsOpened: "I opened Search Alerts. Tell me the city or ZIP where you want listings, and I will help shape the search.",
+      idxSearch: "The live Matrix IDX search is on Map + List. Use the MLS tools there for the most accurate live results from your IDX feed.",
+      favorites: "I opened Favorites. Visitors can save homes from the Featured listings and come back to them on this device.",
+      hoa: "For HOA, I can track No HOA or a maximum monthly HOA. Tell me something like: no HOA, HOA under 500, or any HOA.",
+      budgetKnown: `I have your budget as ${values.budget}. Do you already have a pre-approval, or do you need help getting ready?`,
+      budgetAsk: "What price range are you comfortable with? Example: 500k to 800k.",
+      zipFound: `I found ZIP ${values.zip}: ${values.location}, ${values.county} County.`,
+      sent: "Thank you. I sent your information to Misael. He can follow up with the best next step.",
+      contactSaved: "Thank you. I have your contact. What city, budget, and type of home are you looking for?",
+      sentWithContact: "I have enough information to help. I sent your request to Misael and opened the contact page in case you want to add more details.",
+      fallback: "I can help with buying, selling, renting, MLS search, HOA, and saved alerts. Tell me your city, budget, bedrooms, and when you want to move."
+    },
+    es: {
+      reset: "No hay problema. Empecemos de nuevo. Quieres comprar, vender o rentar?",
+      readyToSend: "Perfecto. Ya tengo suficiente informacion y se la estoy enviando a Misael.",
+      showingHelp: "Perfecto, puedo ayudarte a coordinar una cita para ver la propiedad.",
+      showingReady: "Perfecto. Ya tengo los detalles de la cita y se los estoy enviando a Misael.",
+      alertsOpenedReady: "Abri las alertas de busqueda para guardar ciudad, precio, habitaciones, HOA y frecuencia.",
+      alertsOpened: "Abri las alertas de busqueda. Dime la ciudad o ZIP donde quieres propiedades y te ayudo a preparar la busqueda.",
+      idxSearch: "La busqueda en vivo de Matrix IDX esta en Mapa + Lista. Usa esas herramientas del MLS para ver resultados reales de tu IDX.",
+      favorites: "Abri Favoritos. Los visitantes pueden guardar propiedades destacadas y volver a verlas en este dispositivo.",
+      hoa: "Para HOA, puedo guardar No HOA o un maximo mensual. Dime por ejemplo: no HOA, HOA menos de 500, o cualquier HOA.",
+      budgetKnown: `Tengo tu presupuesto como ${values.budget}. Ya tienes pre-aprobacion o necesitas ayuda para prepararte?`,
+      budgetAsk: "Que rango de precio prefieres? Ejemplo: 500k a 800k.",
+      zipFound: `Encontre el ZIP ${values.zip}: ${values.location}, condado de ${values.county}.`,
+      sent: "Gracias. Envie tu informacion a Misael para que te contacte con el mejor proximo paso.",
+      contactSaved: "Gracias. Ya tengo tu contacto. Que ciudad, presupuesto y tipo de propiedad estas buscando?",
+      sentWithContact: "Ya tengo suficiente informacion. Envie tu solicitud a Misael y abri la pagina de contacto por si quieres agregar mas detalles.",
+      fallback: "Puedo ayudarte a comprar, vender, rentar, buscar en el MLS, HOA y alertas guardadas. Dime ciudad, presupuesto, habitaciones y cuando quieres moverte."
+    }
+  };
+  return lines[botLanguage()][key] || lines.en[key] || "";
+}
+
 function normalizeBotText(value) {
-  return String(value)
+  return stripAccents(String(value))
     .toLowerCase()
+    .replace(/\bcomprar\b|\bcompro\b|\bcomprando\b/g, "buy")
+    .replace(/\bvender\b|\bvendo\b|\bvendiendo\b/g, "sell")
+    .replace(/\brentar\b|\brenta\b|\balquilar\b|\balquiler\b/g, "rent")
+    .replace(/\bcasa\b|\bcasas\b|\bvivienda\b/g, "house")
+    .replace(/\bcondominio\b|\bcondominios\b|\bapartamento\b|\bapartamentos\b/g, "condo")
+    .replace(/\bpresupuesto\b|\bprecio\b|\bprecios\b/g, "budget")
+    .replace(/\bhabitacion\b|\bhabitaciones\b|\bcuarto\b|\bcuartos\b|\bdormitorio\b|\bdormitorios\b|\brecamara\b|\brecamaras\b/g, "bedrooms")
+    .replace(/\bbano\b|\bbanos\b/g, "baths")
+    .replace(/\bcorreo\b/g, "email")
+    .replace(/\btelefono\b|\bcelular\b/g, "phone")
+    .replace(/\bcita\b|\bmostrar\b|\bver\b|\bvisitar\b/g, "showing")
+    .replace(/\bbuscar\b|\bbusqueda\b/g, "search")
+    .replace(/\bguardar\b|\bguardado\b/g, "save")
+    .replace(/\bfavorito\b|\bfavoritos\b/g, "favorite")
+    .replace(/\bhoy\b/g, "today")
+    .replace(/\bmanana\b/g, "tomorrow")
+    .replace(/\bsemana\b|\bsemanas\b/g, "week")
+    .replace(/\bmes\b|\bmeses\b/g, "month")
+    .replace(/\bproxima\b|\bproximo\b|\bprox\b/g, "next")
+    .replace(/\besta\b|\beste\b/g, "this")
+    .replace(/\blunes\b/g, "monday")
+    .replace(/\bmartes\b/g, "tuesday")
+    .replace(/\bmiercoles\b/g, "wednesday")
+    .replace(/\bjueves\b/g, "thursday")
+    .replace(/\bviernes\b/g, "friday")
+    .replace(/\bsabado\b/g, "saturday")
+    .replace(/\bdomingo\b/g, "sunday")
+    .replace(/\benero\b/g, "january")
+    .replace(/\bfebrero\b/g, "february")
+    .replace(/\bmarzo\b/g, "march")
+    .replace(/\babril\b/g, "april")
+    .replace(/\bmayo\b/g, "may")
+    .replace(/\bjunio\b/g, "june")
+    .replace(/\bjulio\b/g, "july")
+    .replace(/\bagosto\b/g, "august")
+    .replace(/\bseptiembre\b/g, "september")
+    .replace(/\boctubre\b/g, "october")
+    .replace(/\bnoviembre\b/g, "november")
+    .replace(/\bdiciembre\b/g, "december")
     .replace(/\bmont\b|\bmonht\b|\bmoth\b|\bmnth\b/g, "month")
     .replace(/\bmonts\b|\bmonhts\b|\bmoths\b|\bmnths\b/g, "months")
     .replace(/\bnexxt\b|\bnextt\b|\bnxt\b/g, "next")
@@ -740,18 +848,35 @@ function nextImportantLeadField() {
 
 function smartFollowUp(field) {
   const prompts = {
-    goal: "Are you buying, selling, renting, or scheduling a showing?",
-    "city or ZIP": "Which city or ZIP do you prefer? For example Miami, Doral, Brickell, Aventura, or Coral Gables.",
-    budget: "What budget or price range should I use? Example: 600k to 900k.",
-    bedrooms: "How many bedrooms do you need?",
-    timeline: "When would you like to move or see homes: this week, next week, this month, next month, or a specific day?",
-    "email or phone": "What email or phone number should Misael use to contact you?"
+    en: {
+      goal: "Are you buying, selling, or renting?",
+      "city or ZIP": "Which city or ZIP do you prefer? For example Miami, Doral, Brickell, Aventura, or Coral Gables.",
+      budget: "What budget or price range should I use? Example: 600k to 900k.",
+      bedrooms: "How many bedrooms do you need?",
+      timeline: "When would you like to move or see homes: this week, next week, this month, next month, or a specific day?",
+      "email or phone": "What email or phone number should Misael use to contact you?"
+    },
+    es: {
+      goal: "Quieres comprar, vender o rentar?",
+      "city or ZIP": "Que ciudad o ZIP prefieres? Por ejemplo Miami, Doral, Brickell, Aventura o Coral Gables.",
+      budget: "Que presupuesto o rango de precio quieres usar? Ejemplo: 600k a 900k.",
+      bedrooms: "Cuantas habitaciones necesitas?",
+      timeline: "Cuando quieres mudarte o ver propiedades: esta semana, proxima semana, este mes, proximo mes o un dia especifico?",
+      "email or phone": "Que email o telefono debe usar Misael para contactarte?"
+    }
   };
-  return prompts[field] || "Tell me a little more so I can help.";
+  return prompts[botLanguage()][field] || prompts.en[field] || (botLanguage() === "es" ? "Dime un poco mas para ayudarte." : "Tell me a little more so I can help.");
 }
 
 function acknowledgePrompt(prompt) {
   const text = normalizeBotText(prompt);
+  if (botLanguage() === "es") {
+    if (text.includes("thank") || text.includes("gracias")) return "De nada.";
+    if (text.includes("yes") || text.includes("si") || text.includes("ok")) return "Perfecto.";
+    if (text.includes("no ")) return "No hay problema.";
+    if (/\b3\d{4}\b/.test(text)) return "Entendido.";
+    return "Entendido.";
+  }
   if (text.includes("thank")) return "You are welcome.";
   if (text.includes("yes") || text.includes("ok")) return "Great.";
   if (text.includes("no ")) return "No problem.";
@@ -762,15 +887,27 @@ function acknowledgePrompt(prompt) {
 function leadSummarySentence() {
   const lead = state.botLead;
   const parts = [];
-  if (lead.intent) parts.push(lead.intent);
+  if (lead.intent) parts.push(localizeIntent(lead.intent));
   if (lead.location) parts.push(lead.zip ? `${lead.location} ${lead.zip}` : lead.location);
-  if (lead.county) parts.push(`${lead.county} County`);
+  if (lead.county) parts.push(botLanguage() === "es" ? `condado de ${lead.county}` : `${lead.county} County`);
   if (lead.budget) parts.push(lead.budget);
   if (lead.beds) parts.push(lead.beds);
   if (lead.propertyType) parts.push(lead.propertyType);
   if (lead.hoa) parts.push(lead.hoa);
   if (!parts.length) return "";
-  return `So far I have: ${parts.join(", ")}.`;
+  return botLanguage() === "es" ? `Hasta ahora tengo: ${parts.join(", ")}.` : `So far I have: ${parts.join(", ")}.`;
+}
+
+function localizeIntent(intent) {
+  if (botLanguage() !== "es") return intent;
+  const labels = {
+    buyer: "comprador",
+    seller: "vendedor",
+    renter: "renta",
+    showing: "cita para ver propiedad",
+    "search alert": "alerta de busqueda"
+  };
+  return labels[intent] || intent;
 }
 
 function countyForCity(city) {
