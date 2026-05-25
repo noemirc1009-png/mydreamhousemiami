@@ -647,14 +647,16 @@ function updateBotLead(prompt) {
   if (normalized.includes("cash")) lead.financing = "Cash";
   if (normalized.includes("pre approved") || normalized.includes("pre-approved") || normalized.includes("preapproval")) lead.financing = "Pre-approved";
 
-  const timelineWords = ["today", "tomorrow", "this week", "this month", "weekend", "month", "soon", "asap", "30 days", "60 days", "90 days", "later"];
+  const timelineWords = ["today", "tomorrow", "this week", "next week", "this month", "weekend", "month", "week", "soon", "asap", "30 days", "60 days", "90 days", "later"];
   const timeline = timelineWords.find((word) => normalized.includes(word));
   if (timeline) lead.timeline = timeline;
 }
 
 function detectLooseTimeline(text) {
+  if (text.includes("next") && text.includes("week")) return "next week";
   if (text.includes("this") && text.includes("month")) return "this month";
   if (text.includes("this") && text.includes("week")) return "this week";
+  if (text.trim() === "week" || text.includes("in a week")) return "next week";
   if (text.includes("weekend")) return "weekend";
   if (text.includes("soon") || text.includes("asap")) return "soon";
   if (text.includes("later")) return "later";
@@ -669,6 +671,7 @@ function normalizeBotText(value) {
   return String(value)
     .toLowerCase()
     .replace(/\bmont\b|\bmonht\b|\bmoth\b|\bmnth\b/g, "month")
+    .replace(/\bnexxt\b|\bnextt\b|\bnxt\b/g, "next")
     .replace(/\bths\b|\bdis\b/g, "this")
     .replace(/\btomorow\b|\btommorow\b/g, "tomorrow")
     .replace(/\bweak\b/g, "week")
